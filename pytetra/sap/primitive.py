@@ -1,0 +1,3 @@
+
+class Primitive:
+    pass
