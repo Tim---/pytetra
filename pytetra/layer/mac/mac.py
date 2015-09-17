@@ -48,4 +48,4 @@ class UpperMac:
 
     def recv(self, prim):
         if isinstance(prim, TmvUnidataIndication):
-            print prim.block
+            pass#print prim.block
