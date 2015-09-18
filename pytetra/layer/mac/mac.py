@@ -3,8 +3,10 @@ from pytetra.layer.mac.interleaving import BSCHInterleaver
 from pytetra.layer.mac.puncturer import Puncturer_2_3
 from pytetra.layer.mac.convolutional import TETRAConvolutionalEncoder
 from pytetra.layer.mac.crc import TETRACRC
+from pytetra.layer.mac.pdu import SyncPdu
 from pytetra.sap.tpsap import TpUnidataIndication
 from pytetra.sap.tmvsap import TmvUnidataIndication
+from pytetra.sap.tmbsap import TmbSyncIndication
 
 class LowerMac:
     def __init__(self, tpsap, tmvsap):
@@ -15,9 +17,10 @@ class LowerMac:
 
     def recv(self, prim):
         if isinstance(prim, TpUnidataIndication):
-            self.decodeSB(prim.block)
+            if prim.channel == "BSCH":
+                self.decodeBSCH(prim.block)
 
-    def decodeSB(self, b5):
+    def decodeBSCH(self, b5):
         # Uncrambling
         s = BSCHScrambler()
         b4 = list(s.unscramble(b5))
@@ -42,10 +45,15 @@ class LowerMac:
         self.tmvsap.send(prim)
 
 class UpperMac:
-    def __init__(self, tmvsap):
+    def __init__(self, tmvsap, tmbsap):
         self.tmvsap = tmvsap
+        self.tmbsap = tmbsap
         tmvsap.register(self)
+        tmbsap.register(self)
 
     def recv(self, prim):
-        if isinstance(prim, TmvUnidataIndication):
-            pass#print prim.block
+        if isinstance(prim, TmvUnidataIndication) and prim.crc_pass:
+            if prim.channel == "BSCH":
+                pdu = SyncPdu.parse(prim.block)
+                prim = TmbSyncIndication(pdu['tm_sdu'])
+                self.tmbsap.send(prim)

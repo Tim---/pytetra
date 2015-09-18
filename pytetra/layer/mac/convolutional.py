@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 def toBin(x, n):
-    return [x >> i & 1 for i in reversed(range(n))]
+    return map(int, bin(x)[2:].zfill(n))
 
 def chunk(l, n):
     for i in range(len(l)/n):

@@ -42,6 +42,12 @@ class NormalContinuousDownlinkBurst(Burst):
         ('q2', 10),
     ]
 
+    def __init__(self, bits):
+        Burst.__init__(self, bits)
+        self.BKN1 = self.bkn1
+        self.BB = self.bb1 + self.bb2
+        self.BKN2 = self.bkn2
+    
     def check(self):
         return self.q2 + self.q1 == q and self.n_p in (n, p)
 
@@ -58,9 +64,12 @@ class SynchronizationContinuousDownlinkBurst(Burst):
         ('hd', 2),
         ('q2', 10),
     ]
+    
     def __init__(self, bits):
         Burst.__init__(self, bits)
-        self.SB = bits[94:214]
+        self.SB = self.sb
+        self.BB = self.bb
+        self.BKN2 = self.bkn2
     
     def check(self):
         return self.q2 + self.q1 == q and self.f == f and self.y == y
@@ -79,6 +88,12 @@ class NormalDisontinuousDownlinkBurst(Burst):
         ('q2', 2),
     ]
 
+    def __init__(self, bits):
+        Burst.__init__(self, bits)
+        self.BKN1 = self.bkn1
+        self.BB = self.bb1 + self.bb2
+        self.BKN2 = self.bkn2
+
     def check(self):
         return self.q1 == q[-2:] and self.q2 == q[:2] and self.n_p in (n, p)
 
@@ -95,6 +110,12 @@ class SynchronizationDisontinuousDownlinkBurst(Burst):
         ('hj', 2),
         ('q2', 2),
     ]
-    
+
+    def __init__(self, bits):
+        Burst.__init__(self, bits)
+        self.SB = self.sb
+        self.BB = self.bb
+        self.BKN2 = self.bkn2
+
     def check(self):
         return self.q1 == q[-2:] and self.q2 == q[:2] and self.f == f and self.y == y
