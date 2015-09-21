@@ -8,6 +8,7 @@ from pytetra.layer.mac.rmcode import ReedMuller
 from pytetra.sap.tpsap import TpUnidataIndication
 from pytetra.sap.tmvsap import TmvUnidataIndication
 from pytetra.sap.tmbsap import TmbSyncIndication
+from pytetra.timebase import g_timebase
 
 class LowerMac:
     def __init__(self, tpsap, tmvsap):
@@ -59,7 +60,6 @@ class LowerMac:
         # Reed Muller decode
         rm = ReedMuller()
         crc_pass = rm.check(b2)
-        print crc_pass
         b1 = rm.decode(b2)
         
         prim = TmvUnidataIndication(b1, "AACH", crc_pass)
@@ -71,12 +71,14 @@ class UpperMac:
         self.tmbsap = tmbsap
         tmvsap.register(self)
         tmbsap.register(self)
-
+        
     def recv(self, prim):
         if isinstance(prim, TmvUnidataIndication) and prim.crc_pass:
             if prim.channel == "BSCH":
                 pdu = SyncPdu.parse(prim.block)
+                g_timebase.update(pdu['timeslot_number'] + 1, pdu['frame_number'], pdu['multiframe_number'])
                 prim = TmbSyncIndication(pdu['tm_sdu'])
                 self.tmbsap.send(prim)
             elif prim.channel == "AACH":
                 pdu = AccessAssignPdu.parse(prim.block)
+

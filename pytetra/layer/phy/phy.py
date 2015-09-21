@@ -1,6 +1,7 @@
 from pytetra.layer import Layer
 from pytetra.sap.tpsap import TpUnidataIndication
 from pytetra.layer.phy.burst import SynchronizationContinuousDownlinkBurst, NormalContinuousDownlinkBurst, SynchronizationDisontinuousDownlinkBurst, NormalDisontinuousDownlinkBurst, TrainingSequenceError
+from pytetra.timebase import g_timebase
 
 class Phy(Layer):
     def __init__(self, tpsap):
@@ -22,16 +23,17 @@ class Phy(Layer):
         for cls in [SynchronizationContinuousDownlinkBurst, NormalContinuousDownlinkBurst, SynchronizationDisontinuousDownlinkBurst, NormalDisontinuousDownlinkBurst]:
             try:
                 burst = cls(self.stream[:510])
-                print cls
                 del self.stream[:510]
                 break
             except TrainingSequenceError:
                 pass
         else:
-            print "lost sync"
             self.locked = False
+            print "Phy : lost sync"
             return
         
+        g_timebase.increment()
+
         if cls == SynchronizationContinuousDownlinkBurst:
             ind = TpUnidataIndication(burst.SB, "BSCH")
             self.tpsap.send(ind)
