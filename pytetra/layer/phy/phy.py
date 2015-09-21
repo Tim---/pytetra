@@ -31,11 +31,13 @@ class Phy(Layer):
             print "lost sync"
             self.locked = False
             return
+        
         if cls == SynchronizationContinuousDownlinkBurst:
-            #burst = SynchronizationContinuousDownlinkBurst(self.stream[:510])
             ind = TpUnidataIndication(burst.SB, "BSCH")
             self.tpsap.send(ind)
-            self.locked = True
+        elif cls == NormalContinuousDownlinkBurst:
+            ind = TpUnidataIndication(burst.BB, "AACH")
+            self.tpsap.send(ind)
     
     def feed(self, data):
         self.stream.extend(data)

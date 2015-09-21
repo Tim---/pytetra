@@ -42,3 +42,11 @@ class SyncPdu(Pdu):
         BitsField("tm_sdu", 29),
     ]
 
+# 21.4.7 MAC PDU structure for access assignment broadcast
+class AccessAssignPdu(Pdu):
+    fields_desc = [
+        UIntField("header", 2),
+        UIntField("field1", 6),
+        UIntField("field2", 6),
+    ]
+

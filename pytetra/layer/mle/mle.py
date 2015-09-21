@@ -9,4 +9,3 @@ class Mle:
     def recv(self, prim):
         if isinstance(prim, TlSyncIndication):
             pdu = DMleSyncPdu.parse(prim.sdu)
-            print pdu
