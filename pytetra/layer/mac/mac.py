@@ -5,7 +5,7 @@ from pytetra.layer.mac.convolutional import TETRAConvolutionalEncoder
 from pytetra.layer.mac.crc import TETRACRC
 from pytetra.layer.mac.pdu import SyncPdu, AccessAssignPdu
 from pytetra.layer.mac.rmcode import ReedMuller
-from pytetra.sap.tpsap import TpUnidataIndication
+from pytetra.sap.tpsap import TpSBIndication, TpNDBIndication
 from pytetra.sap.tmvsap import TmvUnidataIndication
 from pytetra.sap.tmbsap import TmbSyncIndication
 from pytetra.timebase import g_timebase
@@ -22,11 +22,10 @@ class LowerMac:
         self.colour_code = 1
         
     def recv(self, prim):
-        if isinstance(prim, TpUnidataIndication):
-            if prim.channel == "BSCH":
-                self.decodeBSCH(prim.block)
-            elif prim.channel == "AACH":
-                self.decodeAACH(prim.block)
+        if isinstance(prim, TpSBIndication):
+            self.decodeBSCH(prim.SB)
+        elif isinstance(prim, TpNDBIndication):
+            self.decodeAACH(prim.BB)
 
     def decodeBSCH(self, b5):
         # Uncrambling

@@ -1,5 +1,5 @@
 from pytetra.layer import Layer
-from pytetra.sap.tpsap import TpUnidataIndication
+from pytetra.sap.tpsap import TpSBIndication, TpNDBIndication
 from pytetra.layer.phy.burst import SynchronizationContinuousDownlinkBurst, NormalContinuousDownlinkBurst, SynchronizationDisontinuousDownlinkBurst, NormalDisontinuousDownlinkBurst, TrainingSequenceError
 from pytetra.timebase import g_timebase
 
@@ -35,10 +35,10 @@ class Phy(Layer):
         g_timebase.increment()
 
         if cls == SynchronizationContinuousDownlinkBurst:
-            ind = TpUnidataIndication(burst.SB, "BSCH")
+            ind = TpSBIndication(burst.SB, burst.BB, burst.BKN2)
             self.tpsap.send(ind)
         elif cls == NormalContinuousDownlinkBurst:
-            ind = TpUnidataIndication(burst.BB, "AACH")
+            ind = TpNDBIndication(burst.BB, burst.BKN1, burst.BKN2)
             self.tpsap.send(ind)
     
     def feed(self, data):
