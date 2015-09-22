@@ -1,5 +1,5 @@
 from pytetra.layer.mac.scrambling import BSCHScrambler, Scrambler
-from pytetra.layer.mac.interleaving import BSCHInterleaver
+from pytetra.layer.mac.interleaving import BSCHInterleaver, SCHFInterleaver
 from pytetra.layer.mac.puncturer import Puncturer_2_3
 from pytetra.layer.mac.convolutional import TETRAConvolutionalEncoder
 from pytetra.layer.mac.crc import TETRACRC
@@ -33,10 +33,10 @@ class LowerMac:
             if self.upper.mode == "signalling":
                 if prim.SF == 0:
                     BKN = prim.BKN1 + prim.BKN2
-                    self.decodeSCH_F(BKN)
+                    self.decodeSCHF(BKN)
                 else:
-                    self.decodeSCH_HD(prim.BKN1)
-                    self.decodeSCH_HD(prim.BKN2)
+                    self.decodeSCHHD(prim.BKN1)
+                    self.decodeSCHHD(prim.BKN2)
             elif self.upper.mode == "traffic":
                 if prim.SF == 0:
                     BKN = prim.BKN1 + prim.BKN2
@@ -48,10 +48,31 @@ class LowerMac:
                     else:
                         self.decodeTCH(prim.BKN2)
 
-    def decodeSCH_F(self, b5):
-        pass
+    def decodeSCHF(self, b5):
+        # Uncrambling
+        s = Scrambler(map(int, '{0:010b}{0:014b}{0:06b}'.format(self.mcc, self.mnc, self.colour_code)))
+        b4 = list(s.unscramble(b5))
 
-    def decodeSCH_HD(self, b5):
+        # Deinterleaving
+        i = SCHFInterleaver()
+        b3 = i.deinterleave(b4)
+
+        # Rate-compatible punctured convolutional codes
+        p = Puncturer_2_3()
+        b3dp = p.depuncture(b3)
+        c = TETRAConvolutionalEncoder()
+        b2 = c.decode(b3dp)
+        b2, tail = b2[:-4], b2[-4:]
+
+        # CRC
+        b1, crc = b2[:-16], b2[-16:]
+        c = TETRACRC()
+        crc_pass = c.compute(b1) == crc
+
+        prim = TmvUnidataIndication(b1, "SCH/F", crc_pass)
+        self.tmvsap.send(prim)
+
+    def decodeSCHHD(self, b5):
         pass
 
     def decodeTCH(self, b5):
@@ -115,9 +136,9 @@ class UpperMac:
                 self.tmbsap.send(prim)
             elif prim.channel == "AACH":
                 pdu = AccessAssignPdu.parse(prim.block)
-                
+
                 # Traffic mode ?
-                if g_timebase.fn != 18 or pdu['header'] != 0 and pdu['field1'] > 3:
+                if g_timebase.fn != 18 and pdu['header'] != 0 and pdu['field1'] > 3:
                     self.mode = "traffic"
                 else:
                     self.mode = "signalling"

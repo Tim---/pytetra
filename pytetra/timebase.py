@@ -24,5 +24,8 @@ class Timebase:
             missed += 1
         if missed:
             print 'Timebase : missed %s timeslots' % (missed, )
+    
+    def dumpTime(self):
+        return '%s/%s/%s' % (self.mn, self.fn, self.tn)
 
 g_timebase = Timebase()

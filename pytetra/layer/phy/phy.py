@@ -10,6 +10,7 @@ class Phy(Layer):
         tpsap.register(self)
         self.locked = False
         self.stream = []
+        self.index = 0
     
     def sync(self):
         while len(self.stream) > 510 and not self.locked:
@@ -17,16 +18,16 @@ class Phy(Layer):
                 SynchronizationContinuousDownlinkBurst(self.stream[:510])
                 self.locked = True
             except TrainingSequenceError:
-                del self.stream[0]
+                self.delete(1)
 
     def decode(self):
         for cls in [SynchronizationContinuousDownlinkBurst, NormalContinuousDownlinkBurst, SynchronizationDisontinuousDownlinkBurst, NormalDisontinuousDownlinkBurst]:
             try:
                 burst = cls(self.stream[:510])
-                del self.stream[:510]
-                break
             except TrainingSequenceError:
-                pass
+                continue
+            self.delete(510)
+            break
         else:
             self.locked = False
             print "Phy : lost sync"
@@ -48,7 +49,10 @@ class Phy(Layer):
                 self.sync()
             else:
                 self.decode()
-            
+    
+    def delete(self, size):
+        del self.stream[:size]
+        self.index += size
     
     def recv(self, prim):
         pass

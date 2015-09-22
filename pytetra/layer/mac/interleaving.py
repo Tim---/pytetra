@@ -10,3 +10,7 @@ class BlockInterleaver:
 class BSCHInterleaver(BlockInterleaver):
     def __init__(self):
         BlockInterleaver.__init__(self, 120, 11)
+
+class SCHFInterleaver(BlockInterleaver):
+    def __init__(self):
+        BlockInterleaver.__init__(self, 432, 103)
