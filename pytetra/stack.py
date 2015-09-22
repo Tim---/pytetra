@@ -17,5 +17,6 @@ class TetraStack:
         self.phy = Phy(self.tpsap)
         self.lower_mac = LowerMac(self.tpsap, self.tmvsap)
         self.upper_mac = UpperMac(self.tmvsap, self.tmbsap)
+        self.lower_mac.upper = self.upper_mac # TODO : fix
         self.llc = Llc(self.tmbsap, self.tlbsap)
         self.mle = Mle(self.tlbsap)

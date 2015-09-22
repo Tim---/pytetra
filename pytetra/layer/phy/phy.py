@@ -38,7 +38,7 @@ class Phy(Layer):
             ind = TpSBIndication(burst.SB, burst.BB, burst.BKN2)
             self.tpsap.send(ind)
         elif cls == NormalContinuousDownlinkBurst:
-            ind = TpNDBIndication(burst.BB, burst.BKN1, burst.BKN2)
+            ind = TpNDBIndication(burst.BB, burst.BKN1, burst.BKN2, burst.SF)
             self.tpsap.send(ind)
     
     def feed(self, data):

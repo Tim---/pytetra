@@ -11,8 +11,9 @@ class TpSBIndication(Primitive):
         self.BKN2 = BKN2
 
 class TpNDBIndication(Primitive):
-    def __init__(self, BB, BKN1, BKN2):
+    def __init__(self, BB, BKN1, BKN2, SF):
         self.BB = BB
         self.BKN1 = BKN1
         self.BKN2 = BKN2
+        self.SF = SF
 

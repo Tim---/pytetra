@@ -47,6 +47,7 @@ class NormalContinuousDownlinkBurst(Burst):
         self.BKN1 = self.bkn1
         self.BB = self.bb1 + self.bb2
         self.BKN2 = self.bkn2
+        self.SF = self.n_p == n
     
     def check(self):
         return self.q2 + self.q1 == q and self.n_p in (n, p)
@@ -93,6 +94,7 @@ class NormalDisontinuousDownlinkBurst(Burst):
         self.BKN1 = self.bkn1
         self.BB = self.bb1 + self.bb2
         self.BKN2 = self.bkn2
+        self.SF = self.n_p == n
 
     def check(self):
         return self.q1 == q[-2:] and self.q2 == q[:2] and self.n_p in (n, p)

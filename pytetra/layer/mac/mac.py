@@ -21,11 +21,44 @@ class LowerMac:
         self.mnc = 1
         self.colour_code = 1
         
+        self.bkn2_stolen = False
+        
     def recv(self, prim):
         if isinstance(prim, TpSBIndication):
             self.decodeBSCH(prim.SB)
+            self.decodeAACH(prim.BB)
+            # TODO : bkn2
         elif isinstance(prim, TpNDBIndication):
             self.decodeAACH(prim.BB)
+            if self.upper.mode == "signalling":
+                if prim.SF == 0:
+                    BKN = prim.BKN1 + prim.BKN2
+                    self.decodeSCH_F(BKN)
+                else:
+                    self.decodeSCH_HD(prim.BKN1)
+                    self.decodeSCH_HD(prim.BKN2)
+            elif self.upper.mode == "traffic":
+                if prim.SF == 0:
+                    BKN = prim.BKN1 + prim.BKN2
+                    self.decodeTCH(BKN)
+                else:
+                    self.decodeSTCH(prim.BKN1)
+                    if self.bkn2_stolen:
+                        self.decodeSTCH(prim.BKN2)
+                    else:
+                        self.decodeTCH(prim.BKN2)
+
+    def decodeSCH_F(self, b5):
+        pass
+
+    def decodeSCH_HD(self, b5):
+        pass
+
+    def decodeTCH(self, b5):
+        pass
+
+    def decodeSTCH(self, b5):
+        pass
 
     def decodeBSCH(self, b5):
         # Uncrambling
@@ -88,5 +121,3 @@ class UpperMac:
                     self.mode = "traffic"
                 else:
                     self.mode = "signalling"
-                
-
