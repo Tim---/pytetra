@@ -20,7 +20,7 @@ class LowerMac:
         self.mcc = 1
         self.mnc = 1
         self.colour_code = 1
-
+        
     def recv(self, prim):
         if isinstance(prim, TpUnidataIndication):
             if prim.channel == "BSCH":
@@ -71,7 +71,9 @@ class UpperMac:
         self.tmbsap = tmbsap
         tmvsap.register(self)
         tmbsap.register(self)
-        
+       
+        self.mode = "signalling"
+
     def recv(self, prim):
         if isinstance(prim, TmvUnidataIndication) and prim.crc_pass:
             if prim.channel == "BSCH":
@@ -81,4 +83,11 @@ class UpperMac:
                 self.tmbsap.send(prim)
             elif prim.channel == "AACH":
                 pdu = AccessAssignPdu.parse(prim.block)
+                
+                # Traffic mode ?
+                if g_timebase.fn != 18 or pdu['header'] != 0 and pdu['field1'] > 3:
+                    self.mode = "traffic"
+                else:
+                    self.mode = "signalling"
+                
 
