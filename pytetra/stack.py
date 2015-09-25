@@ -25,6 +25,7 @@ class TetraStack:
         self.lower_mac = LowerMac(self.tpsap, self.tmvsap)
         self.upper_mac = UpperMac(self.tmvsap, self.tmasap, self.tmbsap)
         self.lower_mac.upper = self.upper_mac # TODO : fix
+        self.upper_mac.lower = self.lower_mac # TODO : fix
         self.llc = Llc(self.tmasap, self.tmbsap, self.tlasap, self.tlbsap)
         self.mle = Mle(self.tlasap, self.tlbsap, self.lcmcsap)
         self.cmce = Cmce(self.lcmcsap)

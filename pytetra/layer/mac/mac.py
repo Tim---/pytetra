@@ -33,21 +33,20 @@ class LowerMac:
             self.decodeAACH(prim.BB)
             if self.upper.mode == "signalling":
                 if prim.SF == 0:
-                    BKN = prim.BKN1 + prim.BKN2
-                    self.decodeSCHF(BKN)
+                    self.decodeSCHF(prim.BKN1 + prim.BKN2)
                 else:
                     self.decodeSCHHD(prim.BKN1)
                     self.decodeSCHHD(prim.BKN2)
             elif self.upper.mode == "traffic":
                 if prim.SF == 0:
-                    BKN = prim.BKN1 + prim.BKN2
-                    self.decodeTCH(BKN)
+                    self.decodeTCH(prim.BKN1 + prim.BKN2)
                 else:
                     self.decodeSTCH(prim.BKN1)
                     if self.bkn2_stolen:
                         self.decodeSTCH(prim.BKN2)
                     else:
                         self.decodeTCH(prim.BKN2)
+                    self.bkn2_stolen = False
 
     def decodeSCHF(self, b5):
         # Uncrambling
@@ -101,7 +100,28 @@ class LowerMac:
         pass
 
     def decodeSTCH(self, b5):
-        pass
+        # Uncrambling
+        s = Scrambler(map(int, '{0:010b}{0:014b}{0:06b}'.format(self.mcc, self.mnc, self.colour_code)))
+        b4 = list(s.unscramble(b5))
+
+        # Deinterleaving
+        i = HalfInterleaver()
+        b3 = i.deinterleave(b4)
+
+        # Rate-compatible punctured convolutional codes
+        p = Puncturer_2_3()
+        b3dp = p.depuncture(b3)
+        c = TETRAConvolutionalEncoder()
+        b2 = c.decode(b3dp)
+        b2, tail = b2[:-4], b2[-4:]
+
+        # CRC
+        b1, crc = b2[:-16], b2[-16:]
+        c = TETRACRC()
+        crc_pass = c.compute(b1) == crc
+
+        prim = TmvUnidataIndication(b1, "STCH", crc_pass)
+        self.tmvsap.send(prim)
 
     def decodeBSCH(self, b5):
         # Uncrambling
@@ -166,12 +186,14 @@ class UpperMac:
                     self.mode = "traffic"
                 else:
                     self.mode = "signalling"
-            elif prim.channel == "SCH/F" or prim.channel == "SCH/HD":
+            elif prim.channel in ["SCH/F", "SCH/HD", "STCH"]:
                 while True:
                     if len(prim.block) < 23:
                         break
                     pdu = MacPdu(prim.block)
                     if isinstance(pdu, NullPdu):
+                        if pdu.length_indication == 62:
+                            self.lower.bkn2_stolen = True
                         break
                     else:
                         prim2 = TmaUnitdataIndication(pdu.sdu)
