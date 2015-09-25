@@ -7,6 +7,7 @@ from pytetra.layer.mac.pdu import MacPdu, SyncPdu, AccessAssignPdu
 from pytetra.layer.mac.rmcode import ReedMuller
 from pytetra.sap.tpsap import TpSBIndication, TpNDBIndication
 from pytetra.sap.tmvsap import TmvUnidataIndication
+from pytetra.sap.tmasap import TmaUnitdataIndication
 from pytetra.sap.tmbsap import TmbSyncIndication
 from pytetra.timebase import g_timebase
 
@@ -119,10 +120,12 @@ class LowerMac:
         self.tmvsap.send(prim)
 
 class UpperMac:
-    def __init__(self, tmvsap, tmbsap):
+    def __init__(self, tmvsap, tmasap, tmbsap):
         self.tmvsap = tmvsap
+        self.tmasap = tmasap
         self.tmbsap = tmbsap
         tmvsap.register(self)
+        tmasap.register(self)
         tmbsap.register(self)
        
         self.mode = "signalling"
@@ -149,4 +152,7 @@ class UpperMac:
                     pdu = MacPdu.parse("downlink", prim.block)
                     if pdu['address_type'] == 0:
                         break
+                    else:
+                        prim2 = TmaUnitdataIndication(pdu['sdu'])
+                        self.tmasap.send(prim2)
                 
