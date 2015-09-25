@@ -133,15 +133,15 @@ class UpperMac:
     def recv(self, prim):
         if isinstance(prim, TmvUnidataIndication) and prim.crc_pass:
             if prim.channel == "BSCH":
-                pdu = SyncPdu.parse(prim.block)
-                g_timebase.update(pdu['timeslot_number'] + 1, pdu['frame_number'], pdu['multiframe_number'])
-                prim = TmbSyncIndication(pdu['tm_sdu'])
+                pdu = SyncPdu(prim.block)
+                g_timebase.update(pdu.timeslot_number + 1, pdu.frame_number, pdu.multiframe_number)
+                prim = TmbSyncIndication(pdu.tm_sdu)
                 self.tmbsap.send(prim)
             elif prim.channel == "AACH":
-                pdu = AccessAssignPdu.parse(prim.block)
+                pdu = AccessAssignPdu(prim.block)
 
                 # Traffic mode ?
-                if g_timebase.fn != 18 and pdu['header'] != 0 and pdu['field1'] > 3:
+                if g_timebase.fn != 18 and pdu.header != 0 and pdu.field1 > 3:
                     self.mode = "traffic"
                 else:
                     self.mode = "signalling"
@@ -149,10 +149,10 @@ class UpperMac:
                 while True:
                     if len(prim.block) < 23:
                         break
-                    pdu = MacPdu.parse("downlink", prim.block)
-                    if pdu['address_type'] == 0:
+                    pdu = MacPdu(prim.block)
+                    if pdu.address_type == 0:
                         break
                     else:
-                        prim2 = TmaUnitdataIndication(pdu['sdu'])
+                        prim2 = TmaUnitdataIndication(pdu.sdu)
                         self.tmasap.send(prim2)
                 

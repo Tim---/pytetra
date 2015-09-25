@@ -15,7 +15,7 @@ class Llc:
     def recv(self, prim):
         if isinstance(prim, TmaUnitdataIndication):
             print prim.sdu[:4]
-            pdu = LlcPdu.parse(prim.sdu)
+            pdu = LlcPdu(prim.sdu)
         if isinstance(prim, TmbSyncIndication):
             prim = TlSyncIndication(prim.sdu)
             self.tlbsap.send(prim)

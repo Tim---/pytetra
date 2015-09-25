@@ -8,18 +8,13 @@ class MacPdu(Pdu):
         UIntField("pdu_type", 2),
     ]
 
-    @classmethod
-    def parse(cls, direction, bits):
-        pdu = super(MacPdu, cls).parse(bits)
-        if pdu['pdu_type'] == 0:
-            if direction == "downlink":
-                pdu.update(MacResourcePdu.parse(bits))
-        elif pdu['pdu_type'] == 2:
-            print "Broadcast"
-            pdu.update(BroadcastPdu.parse(bits))
-        else:
-            print "Mac PDU ?", pdu['pdu_type']
-        return pdu
+    def __new__(cls, bits):
+        pdu = super(MacPdu, cls).__new__(cls, bits)
+        super(MacPdu, cls).__init__(pdu, bits)
+        if pdu.pdu_type == 0:
+            return MacResourcePdu(bits)
+        elif pdu.pdu_type == 2:
+            return BroadcastPdu(bits)
 
 # 21.4.3.1 MAC-RESOURCE
 class MacResourcePdu(Pdu):
@@ -30,38 +25,35 @@ class MacResourcePdu(Pdu):
         UIntField("random_access_flag", 1),
         UIntField("length_indication", 6),
         UIntField("address_type", 3),
-        ConditionalField(UIntField("ssi", 24), lambda pkt: pkt['address_type'] in [1, 3, 4, 5, 6, 7]),
-        ConditionalField(UIntField("event_label", 10), lambda pkt: pkt['address_type'] in [2, 5, 7]),
-        ConditionalField(UIntField("usage_marker", 6), lambda pkt: pkt['address_type'] in [6]),
+        ConditionalField(UIntField("ssi", 24), lambda pkt: pkt.address_type in [1, 3, 4, 5, 6, 7]),
+        ConditionalField(UIntField("event_label", 10), lambda pkt: pkt.address_type in [2, 5, 7]),
+        ConditionalField(UIntField("usage_marker", 6), lambda pkt: pkt.address_type in [6]),
         UIntField("power_control_flag", 1),
-        ConditionalField(UIntField("power_control_element", 4), lambda pkt: pkt['power_control_flag']),
+        ConditionalField(UIntField("power_control_element", 4), lambda pkt: pkt.power_control_flag),
         UIntField("slot_granting_flag", 1),
-        ConditionalField(UIntField("slot_granting_element", 8), lambda pkt: pkt['power_control_flag']),
+        ConditionalField(UIntField("slot_granting_element", 8), lambda pkt: pkt.power_control_flag),
         UIntField("channel_allocation_flag", 1),
-        ConditionalField(UIntField("allocation_type", 2), lambda pkt: pkt['channel_allocation_flag']),
-        ConditionalField(UIntField("timeslot_assigned", 4), lambda pkt: pkt['channel_allocation_flag']),
-        ConditionalField(UIntField("up_down_assigned", 2), lambda pkt: pkt['channel_allocation_flag']),
-        ConditionalField(UIntField("clch_permission", 1), lambda pkt: pkt['channel_allocation_flag']),
-        ConditionalField(UIntField("cell_change", 1), lambda pkt: pkt['channel_allocation_flag']),
-        ConditionalField(UIntField("carrier_number", 12), lambda pkt: pkt['channel_allocation_flag']),
-        ConditionalField(UIntField("ext_carrier_number", 1), lambda pkt: pkt['channel_allocation_flag']),
-        ConditionalField(UIntField("freq_band", 4), lambda pkt: pkt['channel_allocation_flag'] and pkt['ext_carrier_number']),
-        ConditionalField(UIntField("offset", 2), lambda pkt: pkt['channel_allocation_flag'] and pkt['ext_carrier_number']),
-        ConditionalField(UIntField("duplex_spacing", 3), lambda pkt: pkt['channel_allocation_flag'] and pkt['ext_carrier_number']),
-        ConditionalField(UIntField("reverse_operation", 1), lambda pkt: pkt['channel_allocation_flag'] and pkt['ext_carrier_number']),
-        ConditionalField(UIntField("monitoring_pattern", 2), lambda pkt: pkt['channel_allocation_flag']),
-        ConditionalField(UIntField("frame_18_monitoring_pattern", 2), lambda pkt: pkt['channel_allocation_flag'] and pkt['monitoring_pattern'] == 0),
+        ConditionalField(UIntField("allocation_type", 2), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("timeslot_assigned", 4), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("up_down_assigned", 2), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("clch_permission", 1), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("cell_change", 1), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("carrier_number", 12), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("ext_carrier_number", 1), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("freq_band", 4), lambda pkt: pkt.channel_allocation_flag and pkt.ext_carrier_number),
+        ConditionalField(UIntField("offset", 2), lambda pkt: pkt.channel_allocation_flag and pkt.ext_carrier_number),
+        ConditionalField(UIntField("duplex_spacing", 3), lambda pkt: pkt.channel_allocation_flag and pkt.ext_carrier_number),
+        ConditionalField(UIntField("reverse_operation", 1), lambda pkt: pkt.channel_allocation_flag and pkt.ext_carrier_number),
+        ConditionalField(UIntField("monitoring_pattern", 2), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("frame_18_monitoring_pattern", 2), lambda pkt: pkt.channel_allocation_flag and pkt.monitoring_pattern == 0),
     ]
-
-    @classmethod
-    def parse(cls, bits):
+    
+    def __init__(self, bits):
         initialSize = len(bits) + 2
-        pdu = super(MacResourcePdu, cls).parse(bits)
-        if 4 <= pdu['length_indication'] <= 34:
-            sduSize = pdu['length_indication'] * 8 - (initialSize - len(bits))
-            pdu['sdu'] = BitsField('sdu', sduSize).dissect(pdu, bits)
-        # TODO : fragmentation and STCH
-        return pdu
+        super(MacResourcePdu, self).__init__(bits)
+        if 4 <= self.length_indication <= 34:
+            sduSize = self.length_indication * 8 - (initialSize - len(bits))
+            self.fields['sdu'] = BitsField('sdu', sduSize).dissect(self, bits)
 
 # 21.4.4 TMB-SAP: MAC PDU structure for broadcast   
 class BroadcastPdu(Pdu):
@@ -69,16 +61,13 @@ class BroadcastPdu(Pdu):
         UIntField("broadcast_type", 2),
     ]
 
-    @classmethod
-    def parse(cls, bits):
-        pdu = super(BroadcastPdu, cls).parse(bits)
-        if pdu['broadcast_type'] == 0:
-            print "SYSINFO"
-            pdu.update(SysinfoPdu.parse(bits))
-        elif pdu['broadcast_type'] == 0:
-            print "ACCESS DEFINE"
-            #pdu.update(AccessDefinePdu.parse(bits))
-        return pdu
+    def __new__(cls, bits):
+        pdu = super(BroadcastPdu, cls).__new__(cls, bits)
+        super(BroadcastPdu, cls).__init__(pdu, bits)
+        if pdu.broadcast_type == 0:
+            return SysinfoPdu(bits)
+        elif pdu.pdu_type == 1:
+            return AccessDefinePdu(bits)
 
 # 21.4.4.1 SYSINFO
 class SysinfoPdu(Pdu):
@@ -102,17 +91,6 @@ class SysinfoPdu(Pdu):
         ConditionalField(UIntField("extended_services", 20), lambda pkt: pkt['optionnal_field'] == 3),
         BitsField("sdu", 42),
     ]
-
-    @classmethod
-    def parse(cls, bits):
-        pdu = super(SysinfoPdu, cls).parse(bits)
-        if pdu['broadcast_type'] == 0:
-            print "SYSINFO"
-            #pdu.update(SysinfoPdu.parse(bits))
-        elif pdu['broadcast_type'] == 0:
-            print "ACCESS DEFINE"
-            #pdu.update(AccessDefinePdu.parse(bits))
-        return pdu
 
 # 21.4.4.2 SYNC
 class SyncPdu(Pdu):

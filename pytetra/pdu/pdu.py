@@ -38,9 +38,13 @@ class ConditionalField(Field):
             return None
 
 class Pdu(object):
-    @classmethod
-    def parse(cls, bits):
-        pkt = OrderedDict()
-        for field in cls.fields_desc:
-            pkt[field.name] = field.dissect(pkt, bits)
-        return pkt
+    def __init__(self, bits):
+        self.fields = OrderedDict()
+        for field in self.fields_desc:
+            self.fields[field.name] = field.dissect(self, bits)
+
+    def __getattr__(self, attr):
+        return self.fields[attr]
+        
+    def __repr__(self):
+        return '\n'.join('%s: %s' % item for item in self.fields.items())
