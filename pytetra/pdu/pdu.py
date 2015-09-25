@@ -16,13 +16,14 @@ class UIntField(Field):
         return res
 
 class BitsField(Field):
-    def __init__(self, name, sz):
+    def __init__(self, name, sz=None):
         self.name = name
         self.sz = sz
 
     def dissect(self, pkt, bits):
-        res = bits[:self.sz]
-        del bits[:self.sz]
+        sz = self.sz or len(bits)
+        res = bits[:sz]
+        del bits[:sz]
         return res
 
 class ConditionalField(Field):
@@ -47,4 +48,4 @@ class Pdu(object):
         return self.fields[attr]
         
     def __repr__(self):
-        return '\n'.join('%s: %s' % item for item in self.fields.items())
+        return '%s\n\t' % (self.__class__.__name__, ) + '\n\t'.join('%s: %s' % item for item in self.fields.items())

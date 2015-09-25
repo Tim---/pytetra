@@ -23,11 +23,13 @@ class BlADataPdu(Pdu):
     fields_desc = [
         UIntField("n_r", 1),
         UIntField("n_s", 1),
+        BitsField("sdu"),
     ]
 
 # 21.2.2.1 BL-UDATA
 class BlUDataPdu(Pdu):
     fields_desc = [
+        BitsField("sdu"),
     ]
 
 # 21.2.2.1 BL-ACK
