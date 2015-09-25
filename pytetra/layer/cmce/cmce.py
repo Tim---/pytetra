@@ -7,5 +7,3 @@ class Cmce:
 
     def recv(self, prim):
         pdu = CmcePdu(prim.sdu)
-        if isinstance(pdu, DConnect):
-            print pdu

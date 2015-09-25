@@ -14,3 +14,7 @@ class BSCHInterleaver(BlockInterleaver):
 class SCHFInterleaver(BlockInterleaver):
     def __init__(self):
         BlockInterleaver.__init__(self, 432, 103)
+
+class HalfInterleaver(BlockInterleaver):
+    def __init__(self):
+        BlockInterleaver.__init__(self, 216, 101)

@@ -107,12 +107,12 @@ class SysinfoPdu(Pdu):
         UIntField("access_parameter", 4),
         UIntField("radio_downlink_timeout", 4),
         UIntField("hyperframe_or_cck", 1),
-        ConditionalField(UIntField("hyperframe_number", 16), lambda pkt: pkt['hyperframe_or_cck'] == 0),
-        ConditionalField(UIntField("cck", 16), lambda pkt: pkt['hyperframe_or_cck'] == 1),
+        ConditionalField(UIntField("hyperframe_number", 16), lambda pkt: pkt.hyperframe_or_cck == 0),
+        ConditionalField(UIntField("cck", 16), lambda pkt: pkt.hyperframe_or_cck == 1),
         UIntField("optionnal_field", 2),
-        ConditionalField(UIntField("ts_common_frames", 20), lambda pkt: pkt['optionnal_field'] in [0, 1]),
-        ConditionalField(UIntField("default_def_access_code_a", 20), lambda pkt: pkt['optionnal_field'] == 2),
-        ConditionalField(UIntField("extended_services", 20), lambda pkt: pkt['optionnal_field'] == 3),
+        ConditionalField(UIntField("ts_common_frames", 20), lambda pkt: pkt.optionnal_field in [0, 1]),
+        ConditionalField(UIntField("default_def_access_code_a", 20), lambda pkt: pkt.optionnal_field == 2),
+        ConditionalField(UIntField("extended_services", 20), lambda pkt: pkt.optionnal_field == 3),
         BitsField("sdu", 42),
     ]
 

@@ -1,5 +1,5 @@
 from pytetra.layer.mac.scrambling import BSCHScrambler, Scrambler
-from pytetra.layer.mac.interleaving import BSCHInterleaver, SCHFInterleaver
+from pytetra.layer.mac.interleaving import BSCHInterleaver, SCHFInterleaver, HalfInterleaver
 from pytetra.layer.mac.puncturer import Puncturer_2_3
 from pytetra.layer.mac.convolutional import TETRAConvolutionalEncoder
 from pytetra.layer.mac.crc import TETRACRC
@@ -74,7 +74,28 @@ class LowerMac:
         self.tmvsap.send(prim)
 
     def decodeSCHHD(self, b5):
-        pass
+        # Uncrambling
+        s = Scrambler(map(int, '{0:010b}{0:014b}{0:06b}'.format(self.mcc, self.mnc, self.colour_code)))
+        b4 = list(s.unscramble(b5))
+
+        # Deinterleaving
+        i = HalfInterleaver()
+        b3 = i.deinterleave(b4)
+
+        # Rate-compatible punctured convolutional codes
+        p = Puncturer_2_3()
+        b3dp = p.depuncture(b3)
+        c = TETRAConvolutionalEncoder()
+        b2 = c.decode(b3dp)
+        b2, tail = b2[:-4], b2[-4:]
+
+        # CRC
+        b1, crc = b2[:-16], b2[-16:]
+        c = TETRACRC()
+        crc_pass = c.compute(b1) == crc
+
+        prim = TmvUnidataIndication(b1, "SCH/HD", crc_pass)
+        self.tmvsap.send(prim)
 
     def decodeTCH(self, b5):
         pass
@@ -145,7 +166,7 @@ class UpperMac:
                     self.mode = "traffic"
                 else:
                     self.mode = "signalling"
-            elif prim.channel == "SCH/F":
+            elif prim.channel == "SCH/F" or prim.channel == "SCH/HD":
                 while True:
                     if len(prim.block) < 23:
                         break
