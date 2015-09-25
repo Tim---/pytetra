@@ -49,3 +49,18 @@ class Pdu(object):
         
     def __repr__(self):
         return '%s\n\t' % (self.__class__.__name__, ) + '\n\t'.join('%s: %s' % item for item in self.fields.items())
+
+class TypedPdu(Pdu):
+    def __init__(self, bits):
+        self.fields = OrderedDict()
+        # Type 1
+        for field in self.type1:
+            self.fields[field.name] = field.dissect(self, bits)
+        # Type 2
+        obit = bits.pop(0)
+        if obit:
+            for field in self.type2:
+                pbit = bits.pop(0)
+                if pbit:
+                    self.fields[field.name] = field.dissect(self, bits)
+        # TODO : type 3 and 4

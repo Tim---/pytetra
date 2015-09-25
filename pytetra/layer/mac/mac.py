@@ -3,7 +3,7 @@ from pytetra.layer.mac.interleaving import BSCHInterleaver, SCHFInterleaver
 from pytetra.layer.mac.puncturer import Puncturer_2_3
 from pytetra.layer.mac.convolutional import TETRAConvolutionalEncoder
 from pytetra.layer.mac.crc import TETRACRC
-from pytetra.layer.mac.pdu import MacPdu, SyncPdu, AccessAssignPdu
+from pytetra.layer.mac.pdu import MacPdu, NullPdu, SyncPdu, AccessAssignPdu
 from pytetra.layer.mac.rmcode import ReedMuller
 from pytetra.sap.tpsap import TpSBIndication, TpNDBIndication
 from pytetra.sap.tmvsap import TmvUnidataIndication
@@ -150,7 +150,7 @@ class UpperMac:
                     if len(prim.block) < 23:
                         break
                     pdu = MacPdu(prim.block)
-                    if pdu.address_type == 0:
+                    if isinstance(pdu, NullPdu):
                         break
                     else:
                         prim2 = TmaUnitdataIndication(pdu.sdu)

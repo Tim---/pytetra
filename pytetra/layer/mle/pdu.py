@@ -12,3 +12,9 @@ class DMleSyncPdu(Pdu):
         UIntField("late_entry_information", 1),
     ]
 
+# 18.4.1.2 PDU type
+class MlePdu(Pdu):
+    fields_desc = [
+        UIntField("protocol_discriminator", 3),
+        BitsField("sdu"),
+    ]

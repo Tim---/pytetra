@@ -16,6 +16,17 @@ class MacPdu(Pdu):
         elif pdu.pdu_type == 2:
             return BroadcastPdu(bits)
 
+# 
+class NullPdu(Pdu):
+    fields_desc = [
+        UIntField("fill_bits_indication", 1),
+        UIntField("position_of_grant", 1),
+        UIntField("encryption_mode", 2),
+        UIntField("random_access_flag", 1),
+        UIntField("length_indication", 6),
+        UIntField("address_type", 3),
+    ]
+
 # 21.4.3.1 MAC-RESOURCE
 class MacResourcePdu(Pdu):
     fields_desc = [
@@ -48,12 +59,25 @@ class MacResourcePdu(Pdu):
         ConditionalField(UIntField("frame_18_monitoring_pattern", 2), lambda pkt: pkt.channel_allocation_flag and pkt.monitoring_pattern == 0),
     ]
     
+    def __new__(cls, bits):
+        pdu = NullPdu(bits[:])
+        if pdu.address_type == 0:
+            return pdu
+        else:
+            return super(MacResourcePdu, cls).__new__(cls, bits)
+
     def __init__(self, bits):
         initialSize = len(bits) + 2
         super(MacResourcePdu, self).__init__(bits)
-        if 4 <= self.length_indication <= 34:
-            sduSize = self.length_indication * 8 - (initialSize - len(bits))
-            self.fields['sdu'] = BitsField('sdu', sduSize).dissect(self, bits)
+        if self.length_indication < 4 or self.length_indication > 34:
+            print "MAC PDU length problem"
+        sduSize = self.length_indication * 8 - (initialSize - len(bits))
+        self.fields['sdu'] = BitsField('sdu', sduSize).dissect(self, bits)
+        if self.fill_bits_indication:
+            while self.sdu[-1] == '0':
+                del self.sdu[-1]
+            del self.sdu[-1]
+        
 
 # 21.4.4 TMB-SAP: MAC PDU structure for broadcast   
 class BroadcastPdu(Pdu):
