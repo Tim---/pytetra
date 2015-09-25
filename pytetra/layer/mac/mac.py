@@ -1,10 +1,5 @@
-from pytetra.layer.mac.scrambling import BSCHScrambler, Scrambler
-from pytetra.layer.mac.interleaving import BSCHInterleaver, SCHFInterleaver, HalfInterleaver
-from pytetra.layer.mac.puncturer import Puncturer_2_3
-from pytetra.layer.mac.convolutional import TETRAConvolutionalEncoder
-from pytetra.layer.mac.crc import TETRACRC
 from pytetra.layer.mac.pdu import MacPdu, NullPdu, SyncPdu, AccessAssignPdu
-from pytetra.layer.mac.rmcode import ReedMuller
+from pytetra.layer.mac.decoder import SCHFDecoder, SCHHDDecoder, STCHDecoder, BSCHDecoder, AACHDecoder
 from pytetra.sap.tpsap import TpSBIndication, TpNDBIndication
 from pytetra.sap.tmvsap import TmvUnidataIndication
 from pytetra.sap.tmasap import TmaUnitdataIndication
@@ -23,6 +18,13 @@ class LowerMac:
         self.colour_code = 1
         
         self.bkn2_stolen = False
+        
+        self.decoder = {}
+        self.decoder['SCH/F'] = SCHFDecoder()
+        self.decoder['SCH/HD'] = SCHHDDecoder()
+        self.decoder['STCH'] = STCHDecoder()
+        self.decoder['BSCH'] = BSCHDecoder()
+        self.decoder['AACH'] = AACHDecoder()
         
     def recv(self, prim):
         if isinstance(prim, TpSBIndication):
@@ -48,51 +50,18 @@ class LowerMac:
                         self.decodeTCH(prim.BKN2)
                     self.bkn2_stolen = False
 
+    def getScramblingCode(self):
+        return map(int, '{0:010b}{0:014b}{0:06b}'.format(self.mcc, self.mnc, self.colour_code))
+
     def decodeSCHF(self, b5):
-        # Uncrambling
-        s = Scrambler(map(int, '{0:010b}{0:014b}{0:06b}'.format(self.mcc, self.mnc, self.colour_code)))
-        b4 = list(s.unscramble(b5))
-
-        # Deinterleaving
-        i = SCHFInterleaver()
-        b3 = i.deinterleave(b4)
-
-        # Rate-compatible punctured convolutional codes
-        p = Puncturer_2_3()
-        b3dp = p.depuncture(b3)
-        c = TETRAConvolutionalEncoder()
-        b2 = c.decode(b3dp)
-        b2, tail = b2[:-4], b2[-4:]
-
-        # CRC
-        b1, crc = b2[:-16], b2[-16:]
-        c = TETRACRC()
-        crc_pass = c.compute(b1) == crc
+        b1, crc_pass = self.decoder['SCH/F'].decode(b5, self.getScramblingCode())
 
         prim = TmvUnidataIndication(b1, "SCH/F", crc_pass)
         self.tmvsap.send(prim)
 
     def decodeSCHHD(self, b5):
-        # Uncrambling
-        s = Scrambler(map(int, '{0:010b}{0:014b}{0:06b}'.format(self.mcc, self.mnc, self.colour_code)))
-        b4 = list(s.unscramble(b5))
-
-        # Deinterleaving
-        i = HalfInterleaver()
-        b3 = i.deinterleave(b4)
-
-        # Rate-compatible punctured convolutional codes
-        p = Puncturer_2_3()
-        b3dp = p.depuncture(b3)
-        c = TETRAConvolutionalEncoder()
-        b2 = c.decode(b3dp)
-        b2, tail = b2[:-4], b2[-4:]
-
-        # CRC
-        b1, crc = b2[:-16], b2[-16:]
-        c = TETRACRC()
-        crc_pass = c.compute(b1) == crc
-
+        b1, crc_pass = self.decoder['SCH/HD'].decode(b5, self.getScramblingCode())
+        
         prim = TmvUnidataIndication(b1, "SCH/HD", crc_pass)
         self.tmvsap.send(prim)
 
@@ -100,62 +69,19 @@ class LowerMac:
         pass
 
     def decodeSTCH(self, b5):
-        # Uncrambling
-        s = Scrambler(map(int, '{0:010b}{0:014b}{0:06b}'.format(self.mcc, self.mnc, self.colour_code)))
-        b4 = list(s.unscramble(b5))
-
-        # Deinterleaving
-        i = HalfInterleaver()
-        b3 = i.deinterleave(b4)
-
-        # Rate-compatible punctured convolutional codes
-        p = Puncturer_2_3()
-        b3dp = p.depuncture(b3)
-        c = TETRAConvolutionalEncoder()
-        b2 = c.decode(b3dp)
-        b2, tail = b2[:-4], b2[-4:]
-
-        # CRC
-        b1, crc = b2[:-16], b2[-16:]
-        c = TETRACRC()
-        crc_pass = c.compute(b1) == crc
-
+        b1, crc_pass = self.decoder['STCH'].decode(b5, self.getScramblingCode())
+        
         prim = TmvUnidataIndication(b1, "STCH", crc_pass)
         self.tmvsap.send(prim)
 
     def decodeBSCH(self, b5):
-        # Uncrambling
-        s = BSCHScrambler()
-        b4 = list(s.unscramble(b5))
-
-        # Deinterleaving
-        i = BSCHInterleaver()
-        b3 = i.deinterleave(b4)
-
-        # Rate-compatible punctured convolutional codes
-        p = Puncturer_2_3()
-        b3dp = p.depuncture(b3)
-        c = TETRAConvolutionalEncoder()
-        b2 = c.decode(b3dp)
-        b2, tail = b2[:-4], b2[-4:]
-
-        # CRC
-        b1, crc = b2[:-16], b2[-16:]
-        c = TETRACRC()
-        crc_pass = c.compute(b1) == crc
+        b1, crc_pass = self.decoder['BSCH'].decode(b5, [0]*30)
         
         prim = TmvUnidataIndication(b1, "BSCH", crc_pass)
         self.tmvsap.send(prim)
 
     def decodeAACH(self, b5):
-        # Uncrambling
-        s = Scrambler(map(int, '{0:010b}{0:014b}{0:06b}'.format(self.mcc, self.mnc, self.colour_code)))
-        b2 = b3 = b4 = list(s.unscramble(b5))
-        
-        # Reed Muller decode
-        rm = ReedMuller()
-        crc_pass = rm.check(b2)
-        b1 = rm.decode(b2)
+        b1, crc_pass = self.decoder['AACH'].decode(b5, self.getScramblingCode())
         
         prim = TmvUnidataIndication(b1, "AACH", crc_pass)
         self.tmvsap.send(prim)
@@ -195,6 +121,8 @@ class UpperMac:
                         if pdu.length_indication == 62:
                             self.lower.bkn2_stolen = True
                         break
+                    if isinstance(pdu, MacPdu):
+                        self.warning('Unknown Mac PDU type')
                     else:
                         prim2 = TmaUnitdataIndication(pdu.sdu)
                         self.tmasap.send(prim2)

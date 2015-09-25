@@ -30,7 +30,7 @@ class Phy(Layer):
             break
         else:
             self.locked = False
-            print "Phy : lost sync"
+            self.info("lost sync")
             return
         
         g_timebase.increment()
