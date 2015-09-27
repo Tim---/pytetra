@@ -30,7 +30,7 @@ class LowerMac:
         if isinstance(prim, TpSBIndication):
             self.decodeBSCH(prim.SB)
             self.decodeAACH(prim.BB)
-            # TODO : bkn2
+            self.decodeSCHHD(prim.BKN2)
         elif isinstance(prim, TpNDBIndication):
             self.decodeAACH(prim.BB)
             if self.upper.mode == "signalling":
