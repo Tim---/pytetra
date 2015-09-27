@@ -7,3 +7,7 @@ class TlbSap(Sap):
 class TlSyncIndication(Primitive):
     def __init__(self, sdu):
         self.sdu = sdu
+
+class TlSysinfoIndication(Primitive):
+    def __init__(self, sdu):
+        self.sdu = sdu

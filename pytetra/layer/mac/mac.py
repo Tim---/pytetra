@@ -1,9 +1,9 @@
-from pytetra.layer.mac.pdu import MacPdu, NullPdu, SyncPdu, AccessAssignPdu
+from pytetra.layer.mac.pdu import MacPdu, NullPdu, SyncPdu, AccessAssignPdu, SysinfoPdu
 from pytetra.layer.mac.decoder import SCHFDecoder, SCHHDDecoder, STCHDecoder, BSCHDecoder, AACHDecoder
 from pytetra.sap.tpsap import TpSBIndication, TpNDBIndication
 from pytetra.sap.tmvsap import TmvUnidataIndication
 from pytetra.sap.tmasap import TmaUnitdataIndication
-from pytetra.sap.tmbsap import TmbSyncIndication
+from pytetra.sap.tmbsap import TmbSyncIndication, TmbSysinfoIndication
 from pytetra.timebase import g_timebase
 
 class LowerMac:
@@ -124,6 +124,10 @@ class UpperMac:
                     if isinstance(pdu, MacPdu):
                         self.warning('Unknown Mac PDU type')
                     else:
-                        prim2 = TmaUnitdataIndication(pdu.sdu)
-                        self.tmasap.send(prim2)
+                        if isinstance(pdu, SysinfoPdu):
+                            prim2 = TmbSysinfoIndication(pdu.sdu)
+                            self.tmbsap.send(prim2)
+                        else:
+                            prim2 = TmaUnitdataIndication(pdu.sdu)
+                            self.tmasap.send(prim2)
                 

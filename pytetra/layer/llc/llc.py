@@ -1,7 +1,7 @@
 from pytetra.sap.tmasap import TmaUnitdataIndication
-from pytetra.sap.tmbsap import TmbSyncIndication
+from pytetra.sap.tmbsap import TmbSyncIndication, TmbSysinfoIndication
 from pytetra.sap.tlasap import TlUnitdataIndication
-from pytetra.sap.tlbsap import TlSyncIndication
+from pytetra.sap.tlbsap import TlSyncIndication, TlSysinfoIndication
 from pytetra.layer.llc.pdu import LlcPdu
 
 class Llc:
@@ -18,9 +18,13 @@ class Llc:
     def recv(self, prim):
         if isinstance(prim, TmaUnitdataIndication):
             pdu = LlcPdu(prim.sdu)
+            #print pdu
             if 'sdu' in pdu.fields:
                 prim = TlUnitdataIndication(pdu.sdu)
                 self.tlasap.send(prim)
-        if isinstance(prim, TmbSyncIndication):
+        elif isinstance(prim, TmbSyncIndication):
             prim = TlSyncIndication(prim.sdu)
+            self.tlbsap.send(prim)
+        elif isinstance(prim, TmbSysinfoIndication):
+            prim = TlSysinfoIndication(prim.sdu)
             self.tlbsap.send(prim)

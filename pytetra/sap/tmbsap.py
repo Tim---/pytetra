@@ -7,3 +7,7 @@ class TmbSap(Sap):
 class TmbSyncIndication(Primitive):
     def __init__(self, sdu):
         self.sdu = sdu
+
+class TmbSysinfoIndication(Primitive):
+    def __init__(self, sdu):
+        self.sdu = sdu

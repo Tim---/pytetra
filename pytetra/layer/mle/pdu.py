@@ -12,6 +12,14 @@ class DMleSyncPdu(Pdu):
         UIntField("late_entry_information", 1),
     ]
 
+# 18.4.2.1 D-MLE-SYNC
+class DMleSysinfoPdu(Pdu):
+    fields_desc = [
+        UIntField("la", 14),
+        UIntField("subscriber_class", 16),
+        UIntField("bs_service_detail", 12),
+    ]
+
 # 18.4.1.2 PDU type
 class MlePdu(Pdu):
     fields_desc = [
