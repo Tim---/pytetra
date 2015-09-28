@@ -18,7 +18,6 @@ class Mle:
             pdu = DMleSyncPdu(prim.sdu)
         elif isinstance(prim, TlSysinfoIndication):
             pdu = DMleSysinfoPdu(prim.sdu)
-            print pdu
         elif isinstance(prim, TlUnitdataIndication):
             pdu = MlePdu(prim.sdu)
             if pdu.protocol_discriminator == 2:

@@ -20,6 +20,24 @@ class Puncturer_2_3(Puncturer):
     def __init__(self):
         Puncturer.__init__(self, 3, [1, 2, 5], lambda i: i)
 
+class FastPuncturer_2_3:
+    def depuncture(self, bits):
+        i = 0
+        while i < len(bits):
+            yield bits[i]
+            yield bits[i+1]
+            yield None
+            yield None
+            yield bits[i+2]
+            yield None
+            yield None
+            yield None
+            i += 3
+
+Puncturer_2_3 = FastPuncturer_2_3
+
 if __name__ == "__main__":
-    p = Puncturer(3, [1, 2, 5], lambda i: i)
-    print list(p.depuncture([0,0,1, 0,1,0 ,1,1,0, 1,0,1, 0,1,0]))
+    bits = [1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0]
+
+    p = Puncturer_2_3()
+    print list(p.depuncture(bits))

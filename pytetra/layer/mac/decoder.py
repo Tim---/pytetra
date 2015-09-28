@@ -14,7 +14,7 @@ class Decoder:
         b3 = self.i.deinterleave(b4)
 
         # Rate-compatible punctured convolutional codes
-        b3dp = self.p.depuncture(b3)
+        b3dp = list(self.p.depuncture(b3))
         b2 = self.e.decode(b3dp)
         b2, tail = b2[:-4], b2[-4:]
 

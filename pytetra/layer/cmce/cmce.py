@@ -7,3 +7,4 @@ class Cmce:
 
     def recv(self, prim):
         pdu = CmcePdu(prim.sdu)
+        print pdu

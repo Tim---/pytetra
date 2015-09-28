@@ -72,6 +72,17 @@ class ConvolutionalEncoder:
         res.reverse()
         return res
 
+class FastDecoder:
+    table = [[(0, 0), (1, 1)], [(3, 1), (2, 0)], [(4, 0), (5, 1)], [(7, 1), (6, 0)], [(8, 0), (9, 1)], [(11, 1), (10, 0)], [(12, 0), (13, 1)], [(15, 1), (14, 0)], [(1, 1), (0, 0)], [(2, 0), (3, 1)], [(5, 1), (4, 0)], [(6, 0), (7, 1)], [(9, 1), (8, 0)], [(10, 0), (11, 1)], [(13, 1), (12, 0)], [(14, 0), (15, 1)]]
+    
+    def decode(self, bits):
+        state = 0
+        res = []
+        for fb in bits[::4]:
+            state, out = self.table[state][fb]
+            res.append(out)
+        return res
+
 class TETRAConvolutionalEncoder(ConvolutionalEncoder):
     def __init__(self):
         N = 4
@@ -91,6 +102,8 @@ class TETRAConvolutionalEncoder(ConvolutionalEncoder):
         ]
         ConvolutionalEncoder.__init__(self, N, K, next_output, next_state)
 
+# /!\ Extremely inaccurate, use at your own risks /!\
+TETRAConvolutionalEncoder = FastDecoder
         
 if __name__ == "__main__":
 
