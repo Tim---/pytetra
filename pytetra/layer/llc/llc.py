@@ -4,6 +4,7 @@ from pytetra.sap.tlasap import TlUnitdataIndication
 from pytetra.sap.tlbsap import TlSyncIndication, TlSysinfoIndication
 from pytetra.layer.llc.pdu import LlcPdu
 
+
 class Llc:
     def __init__(self, tmasap, tmbsap, tlasap, tlbsap):
         self.tmasap = tmasap
@@ -18,7 +19,6 @@ class Llc:
     def recv(self, prim):
         if isinstance(prim, TmaUnitdataIndication):
             pdu = LlcPdu(prim.sdu)
-            #print pdu
             if 'sdu' in pdu.fields:
                 prim = TlUnitdataIndication(pdu.sdu)
                 self.tlasap.send(prim)

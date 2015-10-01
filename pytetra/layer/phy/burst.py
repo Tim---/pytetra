@@ -1,23 +1,25 @@
 #!/usr/bin/env python
 
 # 9.4.4.3.1 Frequency correction bits
-f = [1]*8 + [0]*64 + [1]*8
+f = [1] * 8 + [0] * 64 + [1] * 8
 # 9.4.4.3.2 Normal training sequence
-n = [1,1, 0,1, 0,0, 0,0, 1,1, 1,0, 1,0, 0,1, 1,1, 0,1, 0,0]
-p = [0,1, 1,1, 1,0, 1,0, 0,1, 0,0, 0,0, 1,1, 0,1, 1,1, 1,0]
-q = [1,0, 1,1, 0,1, 1,1, 0,0, 0,0, 0,1, 1,0, 1,0, 1,1, 0,1]
+n = [1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0]
+p = [0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0]
+q = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1]
 # 9.4.4.3.4 Synchronization training sequence
-y = [1,1, 0,0, 0,0, 0,1, 1,0, 0,1, 1,1, 0,0, 1,1, 1,0, 1,0, 0,1, 1,1, 0,0, 0,0, 0,1, 1,0, 0,1, 1,1]
+y = [1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1]
+
 
 class TrainingSequenceError(Exception):
     pass
+
 
 class Burst:
     def __init__(self, bits):
         self.fields = {}
         i = 0
         for name, size in self.fields_desc:
-            self.fields[name] = bits[i:i+size]
+            self.fields[name] = bits[i:i + size]
             i += size
         if not(self.check()):
             raise TrainingSequenceError
@@ -27,6 +29,7 @@ class Burst:
             return self.fields[attr]
         else:
             raise AttributeError
+
 
 # 9.4.4.2.5 Normal continuous downlink self
 class NormalContinuousDownlinkBurst(Burst):
@@ -47,10 +50,11 @@ class NormalContinuousDownlinkBurst(Burst):
         self.BKN1 = self.bkn1
         self.BB = self.bb1 + self.bb2
         self.BKN2 = self.bkn2
-        self.SF = self.n_p == p # 0 : full, 1: half
-    
+        self.SF = self.n_p == p  # 0 : full, 1: half
+
     def check(self):
         return self.q2 + self.q1 == q and self.n_p in (n, p)
+
 
 # 9.4.4.2.6 Synchronization continuous downlink self
 class SynchronizationContinuousDownlinkBurst(Burst):
@@ -65,15 +69,16 @@ class SynchronizationContinuousDownlinkBurst(Burst):
         ('hd', 2),
         ('q2', 10),
     ]
-    
+
     def __init__(self, bits):
         Burst.__init__(self, bits)
         self.SB = self.sb
         self.BB = self.bb
         self.BKN2 = self.bkn2
-    
+
     def check(self):
         return self.q2 + self.q1 == q and self.f == f and self.y == y
+
 
 # 9.4.4.2.7 Normal discontinuous downlink self
 class NormalDisontinuousDownlinkBurst(Burst):
@@ -98,6 +103,7 @@ class NormalDisontinuousDownlinkBurst(Burst):
 
     def check(self):
         return self.q1 == q[-2:] and self.q2 == q[:2] and self.n_p in (n, p)
+
 
 # 9.4.4.2.8 Synchronization discontinuous downlink self
 class SynchronizationDisontinuousDownlinkBurst(Burst):

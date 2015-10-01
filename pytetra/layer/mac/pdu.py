@@ -2,6 +2,7 @@
 
 from pytetra.pdu import Pdu, UIntField, BitsField, ConditionalField
 
+
 # 21.4.1 MAC PDU types
 class MacPdu(Pdu):
     fields_desc = [
@@ -16,7 +17,7 @@ class MacPdu(Pdu):
         elif pdu.pdu_type == 2:
             return BroadcastPdu(bits)
 
-# 
+
 class NullPdu(Pdu):
     fields_desc = [
         UIntField("fill_bits_indication", 1),
@@ -26,6 +27,7 @@ class NullPdu(Pdu):
         UIntField("length_indication", 6),
         UIntField("address_type", 3),
     ]
+
 
 # 21.4.3.1 MAC-RESOURCE
 class MacResourcePdu(Pdu):
@@ -58,7 +60,7 @@ class MacResourcePdu(Pdu):
         ConditionalField(UIntField("monitoring_pattern", 2), lambda pkt: pkt.channel_allocation_flag),
         ConditionalField(UIntField("frame_18_monitoring_pattern", 2), lambda pkt: pkt.channel_allocation_flag and pkt.monitoring_pattern == 0),
     ]
-    
+
     def __new__(cls, bits):
         pdu = NullPdu(bits[:])
         if pdu.address_type == 0:
@@ -77,9 +79,9 @@ class MacResourcePdu(Pdu):
             while self.sdu[-1] == '0':
                 del self.sdu[-1]
             del self.sdu[-1]
-        
 
-# 21.4.4 TMB-SAP: MAC PDU structure for broadcast   
+
+# 21.4.4 TMB-SAP: MAC PDU structure for broadcast
 class BroadcastPdu(Pdu):
     fields_desc = [
         UIntField("broadcast_type", 2),
@@ -92,6 +94,7 @@ class BroadcastPdu(Pdu):
             return SysinfoPdu(bits)
         elif pdu.pdu_type == 1:
             return AccessDefinePdu(bits)
+
 
 # 21.4.4.1 SYSINFO
 class SysinfoPdu(Pdu):
@@ -116,6 +119,7 @@ class SysinfoPdu(Pdu):
         BitsField("sdu", 42),
     ]
 
+
 # 21.4.4.2 SYNC
 class SyncPdu(Pdu):
     fields_desc = [
@@ -132,6 +136,7 @@ class SyncPdu(Pdu):
         BitsField("tm_sdu", 29),
     ]
 
+
 # 21.4.7 MAC PDU structure for access assignment broadcast
 class AccessAssignPdu(Pdu):
     fields_desc = [
@@ -139,4 +144,3 @@ class AccessAssignPdu(Pdu):
         UIntField("field1", 6),
         UIntField("field2", 6),
     ]
-

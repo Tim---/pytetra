@@ -4,6 +4,7 @@ from pytetra.sap.lcmcsap import MleUnitdataIndication
 from pytetra.layer.mle.pdu import MlePdu
 from .pdu import DMleSyncPdu, DMleSysinfoPdu
 
+
 class Mle:
     def __init__(self, tlasap, tlbsap, lcmcsap):
         self.tlasap = tlasap

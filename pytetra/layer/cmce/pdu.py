@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from pytetra.pdu import Pdu, TypedPdu, UIntField, BitsField, Type1Field, Type2Field, Type3Field, Type4Field
+from pytetra.pdu import Pdu, TypedPdu, UIntField, Type1Field, Type2Field
+
 
 # 14.8.28 PDU type
 class CmcePdu(Pdu):
@@ -19,6 +20,7 @@ class CmcePdu(Pdu):
             return DSetup(bits)
         elif pdu.pdu_type == 9:
             return DTxCeased(bits)
+
 
 # 14.7.1.4 D-CONNECT
 class DConnect(TypedPdu):
@@ -44,6 +46,7 @@ class DConnect(TypedPdu):
     type4 = [
     ]
 
+
 # 14.7.1.9 D-RELEASE
 class DRelease(TypedPdu):
     type1 = [
@@ -59,6 +62,7 @@ class DRelease(TypedPdu):
     ]
     type4 = [
     ]
+
 
 # 14.7.1.12 D-SETUP
 class DSetup(TypedPdu):
@@ -88,6 +92,7 @@ class DSetup(TypedPdu):
     type4 = [
     ]
 
+
 # 14.7.1.13 D-TX CEASED
 class DTxCeased(TypedPdu):
     type1 = [
@@ -106,12 +111,12 @@ class DTxCeased(TypedPdu):
 
 
 if __name__ == "__main__":
-    #bits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
-    #print DConnect(bits)
-    #bits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0]
-    #print DSetup(bits)
-    #bits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0]
-    #print DRelease(bits)
-    #bits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]
-    #print DTxCeased(bits)
+    # bits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+    # print DConnect(bits)
+    # bits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0]
+    # print DSetup(bits)
+    # bits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0]
+    # print DRelease(bits)
+    # bits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]
+    # print DTxCeased(bits)
     pass

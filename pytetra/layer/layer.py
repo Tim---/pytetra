@@ -1,5 +1,6 @@
 from pytetra.logger import Logger
 
+
 class Layer:
     def __init__(self):
         pass

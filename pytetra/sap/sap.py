@@ -1,4 +1,3 @@
-from types import FunctionType
 
 class Sap:
     def __init__(self):
@@ -7,6 +6,6 @@ class Sap:
     def send(self, primitive):
         for l in self.listeners:
             l.recv(primitive)
-    
+
     def register(self, listener):
         self.listeners.append(listener)

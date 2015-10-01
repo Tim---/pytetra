@@ -10,4 +10,3 @@ setup(name='pytetra',
       license='GPLv2',
       packages=['pytetra'],
       zip_safe=False)
-

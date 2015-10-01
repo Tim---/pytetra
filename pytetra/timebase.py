@@ -1,10 +1,11 @@
 
+
 # 7.3 Timebase counters
 class Timebase:
     def __init__(self):
-        self.tn = 1 # Timeslot Number
-        self.fn = 1 # TDMA Frame Number
-        self.mn = 1 # TDMA Multiframe Number
+        self.tn = 1  # Timeslot Number
+        self.fn = 1  # TDMA Frame Number
+        self.mn = 1  # TDMA Multiframe Number
 
     def increment(self):
         self.tn += 1
@@ -24,7 +25,7 @@ class Timebase:
             missed += 1
         if missed:
             print 'Timebase : missed %s timeslots' % (missed, )
-    
+
     def dumpTime(self):
         return '%s/%s/%s' % (self.mn, self.fn, self.tn)
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from pytetra.pdu import Pdu, UIntField, BitsField, ConditionalField
+from pytetra.pdu import Pdu, UIntField, BitsField
+
 
 # 21.2.1 LLC PDU types
 class LlcPdu(Pdu):
@@ -18,6 +19,7 @@ class LlcPdu(Pdu):
         elif pdu.pdu_type == 3:
             return BlAckPdu(bits)
 
+
 # 21.2.2.1 BL-ADATA
 class BlADataPdu(Pdu):
     fields_desc = [
@@ -26,15 +28,16 @@ class BlADataPdu(Pdu):
         BitsField("sdu"),
     ]
 
+
 # 21.2.2.1 BL-UDATA
 class BlUDataPdu(Pdu):
     fields_desc = [
         BitsField("sdu"),
     ]
 
+
 # 21.2.2.1 BL-ACK
 class BlAckPdu(Pdu):
     fields_desc = [
         UIntField("n_r", 1),
     ]
-

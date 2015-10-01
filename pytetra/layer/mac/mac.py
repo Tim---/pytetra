@@ -6,26 +6,27 @@ from pytetra.sap.tmasap import TmaUnitdataIndication
 from pytetra.sap.tmbsap import TmbSyncIndication, TmbSysinfoIndication
 from pytetra.timebase import g_timebase
 
+
 class LowerMac:
     def __init__(self, tpsap, tmvsap):
         self.tpsap = tpsap
         self.tmvsap = tmvsap
         tpsap.register(self)
         tmvsap.register(self)
-        
+
         self.mcc = 1
         self.mnc = 1
         self.colour_code = 1
-        
+
         self.bkn2_stolen = False
-        
+
         self.decoder = {}
         self.decoder['SCH/F'] = SCHFDecoder()
         self.decoder['SCH/HD'] = SCHHDDecoder()
         self.decoder['STCH'] = STCHDecoder()
         self.decoder['BSCH'] = BSCHDecoder()
         self.decoder['AACH'] = AACHDecoder()
-        
+
     def recv(self, prim):
         if isinstance(prim, TpSBIndication):
             self.decodeBSCH(prim.SB)
@@ -61,7 +62,7 @@ class LowerMac:
 
     def decodeSCHHD(self, b5):
         b1, crc_pass = self.decoder['SCH/HD'].decode(b5, self.getScramblingCode())
-        
+
         prim = TmvUnidataIndication(b1, "SCH/HD", crc_pass)
         self.tmvsap.send(prim)
 
@@ -70,21 +71,22 @@ class LowerMac:
 
     def decodeSTCH(self, b5):
         b1, crc_pass = self.decoder['STCH'].decode(b5, self.getScramblingCode())
-        
+
         prim = TmvUnidataIndication(b1, "STCH", crc_pass)
         self.tmvsap.send(prim)
 
     def decodeBSCH(self, b5):
         b1, crc_pass = self.decoder['BSCH'].decode(b5, [0]*30)
-        
+
         prim = TmvUnidataIndication(b1, "BSCH", crc_pass)
         self.tmvsap.send(prim)
 
     def decodeAACH(self, b5):
         b1, crc_pass = self.decoder['AACH'].decode(b5, self.getScramblingCode())
-        
+
         prim = TmvUnidataIndication(b1, "AACH", crc_pass)
         self.tmvsap.send(prim)
+
 
 class UpperMac:
     def __init__(self, tmvsap, tmasap, tmbsap):
@@ -94,7 +96,7 @@ class UpperMac:
         tmvsap.register(self)
         tmasap.register(self)
         tmbsap.register(self)
-       
+
         self.mode = "signalling"
 
     def recv(self, prim):
@@ -130,4 +132,3 @@ class UpperMac:
                         else:
                             prim2 = TmaUnitdataIndication(pdu.sdu)
                             self.tmasap.send(prim2)
-                

@@ -3,6 +3,7 @@ from pytetra.sap.tpsap import TpSBIndication, TpNDBIndication
 from pytetra.layer.phy.burst import SynchronizationContinuousDownlinkBurst, NormalContinuousDownlinkBurst, SynchronizationDisontinuousDownlinkBurst, NormalDisontinuousDownlinkBurst, TrainingSequenceError
 from pytetra.timebase import g_timebase
 
+
 class Phy(Layer):
     def __init__(self, tpsap):
         Layer.__init__(self)
@@ -11,7 +12,7 @@ class Phy(Layer):
         self.locked = False
         self.stream = []
         self.index = 0
-    
+
     def sync(self):
         while len(self.stream) > 510 and not self.locked:
             try:
@@ -32,7 +33,7 @@ class Phy(Layer):
             self.locked = False
             self.info("lost sync")
             return
-        
+
         g_timebase.increment()
 
         if cls == SynchronizationContinuousDownlinkBurst:
@@ -41,7 +42,7 @@ class Phy(Layer):
         elif cls == NormalContinuousDownlinkBurst:
             ind = TpNDBIndication(burst.BB, burst.BKN1, burst.BKN2, burst.SF)
             self.tpsap.send(ind)
-    
+
     def feed(self, data):
         self.stream.extend(data)
         while len(self.stream) > 510:
@@ -49,10 +50,10 @@ class Phy(Layer):
                 self.sync()
             else:
                 self.decode()
-    
+
     def delete(self, size):
         del self.stream[:size]
         self.index += size
-    
+
     def recv(self, prim):
         pass

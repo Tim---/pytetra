@@ -2,8 +2,10 @@
 
 from collections import OrderedDict
 
+
 class Field:
     pass
+
 
 class UIntField(Field):
     def __init__(self, name, sz):
@@ -15,6 +17,7 @@ class UIntField(Field):
         del bits[:self.sz]
         return res
 
+
 class BitsField(Field):
     def __init__(self, name, sz=None):
         self.name = name
@@ -25,6 +28,7 @@ class BitsField(Field):
         res = bits[:sz]
         del bits[:sz]
         return res
+
 
 class ConditionalField(Field):
     def __init__(self, field, cond):
@@ -38,6 +42,7 @@ class ConditionalField(Field):
         else:
             return None
 
+
 class Pdu(object):
     def __init__(self, bits):
         self.fields = OrderedDict()
@@ -46,25 +51,26 @@ class Pdu(object):
 
     def __getattr__(self, attr):
         return self.fields[attr]
-        
+
     def __repr__(self):
-        return '%s\n\t' % (self.__class__.__name__, ) + '\n\t'.join('%s: %s' % item for item in self.fields.items())
-
-
+        return '%s\n\t' % (self.__class__.__name__, ) + \
+            '\n\t'.join('%s: %s' % item for item in self.fields.items())
 
 
 def binToInt(x):
     return int(''.join(map(str, x)), 2)
 
+
 class Type1Field(Pdu):
     def __init__(self, name, size):
         self.name = name
         self.size = size
-    
+
     def dissect(self, bits):
         res = binToInt(bits[:self.size])
         del bits[:self.size]
         return res
+
 
 class Type2Field(Pdu):
     def __init__(self, name, size, cond=None):
@@ -77,6 +83,7 @@ class Type2Field(Pdu):
         del bits[:self.size]
         return res
 
+
 class Type3Field(Pdu):
     def __init__(self, name, identifier):
         self.name = name
@@ -86,6 +93,7 @@ class Type3Field(Pdu):
         res = binToInt(bits[:length])
         del bits[:length]
         return res
+
 
 class Type4Field(Pdu):
     def __init__(self, name, identifier):
@@ -99,18 +107,19 @@ class Type4Field(Pdu):
             del bits[:length]
         return res
 
+
 # E.1 PDU encoding rules for CMCE, MM and SNDCP PDUs
 class TypedPdu(Pdu):
     def read(self, size):
         res = binToInt(self.bits[:size])
         del self.bits[:size]
         return res
-    
+
     def __init__(self, bits):
         self.bits = bits
 
         self.fields = OrderedDict()
-        
+
         # Type 1
         for field in self.type1:
             self.fields[field.name] = field.dissect(self.bits)

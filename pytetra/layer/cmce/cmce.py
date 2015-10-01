@@ -1,4 +1,5 @@
-from pytetra.layer.cmce.pdu import CmcePdu, DConnect
+from pytetra.layer.cmce.pdu import CmcePdu
+
 
 class Cmce:
     def __init__(self, lcmcsap):
@@ -7,4 +8,3 @@ class Cmce:
 
     def recv(self, prim):
         pdu = CmcePdu(prim.sdu)
-        print pdu

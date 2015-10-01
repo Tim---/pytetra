@@ -5,6 +5,7 @@ from pytetra.layer.mac.convolutional import TETRAConvolutionalEncoder
 from pytetra.layer.mac.crc import TETRACRC
 from pytetra.layer.mac.rmcode import ReedMuller
 
+
 class Decoder:
     def decode(self, b5, scrambling_code):
         # Uncrambling
@@ -21,8 +22,9 @@ class Decoder:
         # CRC
         b1, crc = b2[:-16], b2[-16:]
         crc_pass = self.c.compute(b1) == crc
-        
+
         return b1, crc_pass
+
 
 class SCHFDecoder(Decoder):
     def __init__(self):
@@ -32,6 +34,7 @@ class SCHFDecoder(Decoder):
         self.e = TETRAConvolutionalEncoder()
         self.c = TETRACRC()
 
+
 class SCHHDDecoder(Decoder):
     def __init__(self):
         self.s = Scrambler()
@@ -40,6 +43,7 @@ class SCHHDDecoder(Decoder):
         self.e = TETRAConvolutionalEncoder()
         self.c = TETRACRC()
 
+
 class BSCHDecoder(Decoder):
     def __init__(self):
         self.s = Scrambler()
@@ -47,6 +51,7 @@ class BSCHDecoder(Decoder):
         self.p = Puncturer_2_3()
         self.e = TETRAConvolutionalEncoder()
         self.c = TETRACRC()
+
 
 class AACHDecoder(Decoder):
     def __init__(self):
@@ -57,7 +62,7 @@ class AACHDecoder(Decoder):
         b2 = b3 = b4 = list(self.s.unscramble(b5, scrambling_code))
         crc_pass = self.rm.check(b2)
         b1 = self.rm.decode(b2)
-        
+
         return b1, crc_pass
 
 STCHDecoder = SCHHDDecoder
