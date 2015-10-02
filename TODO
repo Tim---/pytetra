@@ -1,4 +1,4 @@
- * Replace SAP classes and primitives by methods in the layers
+ * inherit from object
  * improve MAC decoders to be generic, understandable and efficient
  * write a little guide
  * output debugging informations
