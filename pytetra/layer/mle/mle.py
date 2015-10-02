@@ -9,12 +9,17 @@ class Mle(Layer, UpperTlaSap, UpperTlbSap):
         self.stack = stack
 
     def tl_unitdata_indication(self, sdu):
-            pdu = MlePdu(sdu)
-            if pdu.protocol_discriminator == 2:
-                self.stack.cmce.mle_unitdata_indication(pdu.sdu)
+        pdu = MlePdu(sdu)
+        self.info("%s" % (repr(pdu, )))
+        if pdu.protocol_discriminator == 1:
+            self.stack.mm.mle_unitdata_indication(pdu.sdu)
+        if pdu.protocol_discriminator == 2:
+            self.stack.cmce.mle_unitdata_indication(pdu.sdu)
 
     def tl_sync_indication(self, sdu):
-            pdu = DMleSyncPdu(sdu)
+        pdu = DMleSyncPdu(sdu)
+        self.info("%s" % (repr(pdu, )))
 
     def tl_sysinfo_indication(self, sdu):
-            pdu = DMleSysinfoPdu(sdu)
+        pdu = DMleSysinfoPdu(sdu)
+        self.info("%s" % (repr(pdu, )))

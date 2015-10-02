@@ -84,10 +84,12 @@ class UpperMac(Layer, UpperTmvSap):
         if crc_pass:
             if channel == "BSCH":
                 pdu = SyncPdu(block)
+                self.info("%s" % (repr(pdu, )))
                 g_timebase.update(pdu.timeslot_number + 1, pdu.frame_number, pdu.multiframe_number)
                 self.stack.llc.tmb_sync_indication(pdu.tm_sdu)
             elif channel == "AACH":
                 pdu = AccessAssignPdu(block)
+                self.info("%s" % (repr(pdu, )))
 
                 # Traffic mode ?
                 if g_timebase.fn != 18 and pdu.header != 0 and pdu.field1 > 3:
@@ -99,6 +101,7 @@ class UpperMac(Layer, UpperTmvSap):
                     if len(block) < 23:
                         break
                     pdu = MacPdu(block)
+                    self.info("%s" % (repr(pdu, )))
                     if isinstance(pdu, NullPdu):
                         if pdu.length_indication == 62:
                             self.stack.lower_mac.bkn2_stolen = True

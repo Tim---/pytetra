@@ -3,6 +3,7 @@ from pytetra.layer.mac import LowerMac, UpperMac
 from pytetra.layer.llc import Llc
 from pytetra.layer.mle import Mle
 from pytetra.layer.cmce import Cmce
+from pytetra.layer.mm import Mm
 
 
 class TetraStack(object):
@@ -13,3 +14,4 @@ class TetraStack(object):
         self.llc = Llc(self)
         self.mle = Mle(self)
         self.cmce = Cmce(self)
+        self.mm = Mm(self)

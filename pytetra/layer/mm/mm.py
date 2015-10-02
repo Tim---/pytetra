@@ -1,12 +1,12 @@
-from pytetra.layer.cmce.pdu import CmcePdu
-from pytetra.sap.lcmcsap import UpperLcmcSap
+from pytetra.layer.mm.pdu import MmPdu
+from pytetra.sap.lmmsap import UpperLmmSap
 from pytetra.layer import Layer
 
 
-class Cmce(Layer, UpperLcmcSap):
+class Mm(Layer, UpperLmmSap):
     def __init__(self, stack):
         self.stack = stack
 
     def mle_unitdata_indication(self, sdu):
-        pdu = CmcePdu(sdu)
+        pdu = MmPdu(sdu)
         self.info("%s" % (repr(pdu, )))

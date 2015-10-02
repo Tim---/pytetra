@@ -44,7 +44,7 @@ class MacResourcePdu(Pdu):
         UIntField("power_control_flag", 1),
         ConditionalField(UIntField("power_control_element", 4), lambda pkt: pkt.power_control_flag),
         UIntField("slot_granting_flag", 1),
-        ConditionalField(UIntField("slot_granting_element", 8), lambda pkt: pkt.power_control_flag),
+        ConditionalField(UIntField("slot_granting_element", 8), lambda pkt: pkt.slot_granting_flag),
         UIntField("channel_allocation_flag", 1),
         ConditionalField(UIntField("allocation_type", 2), lambda pkt: pkt.channel_allocation_flag),
         ConditionalField(UIntField("timeslot_assigned", 4), lambda pkt: pkt.channel_allocation_flag),

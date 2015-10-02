@@ -10,7 +10,8 @@ class Llc(Layer, UpperTmaSap, UpperTmbSap):
 
     def tma_unitdata_indication(self, sdu):
         pdu = LlcPdu(sdu)
-        if 'sdu' in pdu.fields:
+        self.info("%s" % (repr(pdu, )))
+        if pdu and 'sdu' in pdu.fields:
             self.stack.mle.tl_unitdata_indication(pdu.sdu)
 
     def tmb_sync_indication(self, sdu):

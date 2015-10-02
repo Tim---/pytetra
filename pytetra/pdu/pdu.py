@@ -53,8 +53,8 @@ class Pdu(object):
         return self.fields[attr]
 
     def __repr__(self):
-        return '%s\n\t' % (self.__class__.__name__, ) + \
-            '\n\t'.join('%s: %s' % item for item in self.fields.items())
+        return '<%s ' % (self.__class__.__name__, ) + \
+            ' '.join('%s=%s' % item for item in self.fields.items()) + '>'
 
 
 def binToInt(x):
