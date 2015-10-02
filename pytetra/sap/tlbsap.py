@@ -1,16 +1,9 @@
 from .sap import Sap
-from .primitive import Primitive
 
 
-class TlbSap(Sap):
-    pass
+class UpperTlbSap(Sap):
+    def tl_sync_indication(self, sdu):
+        pass
 
-
-class TlSyncIndication(Primitive):
-    def __init__(self, sdu):
-        self.sdu = sdu
-
-
-class TlSysinfoIndication(Primitive):
-    def __init__(self, sdu):
-        self.sdu = sdu
+    def tl_sysinfo_indication(self, sdu):
+        pass

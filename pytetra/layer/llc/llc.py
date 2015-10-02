@@ -1,30 +1,20 @@
-from pytetra.sap.tmasap import TmaUnitdataIndication
-from pytetra.sap.tmbsap import TmbSyncIndication, TmbSysinfoIndication
-from pytetra.sap.tlasap import TlUnitdataIndication
-from pytetra.sap.tlbsap import TlSyncIndication, TlSysinfoIndication
+from pytetra.sap.tmasap import UpperTmaSap
+from pytetra.sap.tmbsap import UpperTmbSap
 from pytetra.layer.llc.pdu import LlcPdu
+from pytetra.layer import Layer
 
 
-class Llc:
-    def __init__(self, tmasap, tmbsap, tlasap, tlbsap):
-        self.tmasap = tmasap
-        self.tmbsap = tmbsap
-        self.tlasap = tlasap
-        self.tlbsap = tlbsap
-        tmasap.register(self)
-        tmbsap.register(self)
-        tlasap.register(self)
-        tlbsap.register(self)
+class Llc(Layer, UpperTmaSap, UpperTmbSap):
+    def __init__(self, stack):
+        self.stack = stack
 
-    def recv(self, prim):
-        if isinstance(prim, TmaUnitdataIndication):
-            pdu = LlcPdu(prim.sdu)
-            if 'sdu' in pdu.fields:
-                prim = TlUnitdataIndication(pdu.sdu)
-                self.tlasap.send(prim)
-        elif isinstance(prim, TmbSyncIndication):
-            prim = TlSyncIndication(prim.sdu)
-            self.tlbsap.send(prim)
-        elif isinstance(prim, TmbSysinfoIndication):
-            prim = TlSysinfoIndication(prim.sdu)
-            self.tlbsap.send(prim)
+    def tma_unitdata_indication(self, sdu):
+        pdu = LlcPdu(sdu)
+        if 'sdu' in pdu.fields:
+            self.stack.mle.tl_unitdata_indication(pdu.sdu)
+
+    def tmb_sync_indication(self, sdu):
+        self.stack.mle.tl_sync_indication(sdu)
+
+    def tmb_sysinfo_indication(self, sdu):
+        self.stack.mle.tl_sysinfo_indication(sdu)

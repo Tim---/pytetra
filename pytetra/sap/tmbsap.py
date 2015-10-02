@@ -1,16 +1,9 @@
 from .sap import Sap
-from .primitive import Primitive
 
 
-class TmbSap(Sap):
-    pass
+class UpperTmbSap(Sap):
+    def tmb_sync_indication(self, sdu):
+        pass
 
-
-class TmbSyncIndication(Primitive):
-    def __init__(self, sdu):
-        self.sdu = sdu
-
-
-class TmbSysinfoIndication(Primitive):
-    def __init__(self, sdu):
-        self.sdu = sdu
+    def tmb_sysinfo_indication(self, sdu):
+        pass

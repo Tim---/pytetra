@@ -1,26 +1,21 @@
-from pytetra.sap.tlasap import TlUnitdataIndication
-from pytetra.sap.tlbsap import TlSyncIndication, TlSysinfoIndication
-from pytetra.sap.lcmcsap import MleUnitdataIndication
+from pytetra.sap.tlasap import UpperTlaSap
+from pytetra.sap.tlbsap import UpperTlbSap
 from pytetra.layer.mle.pdu import MlePdu
 from .pdu import DMleSyncPdu, DMleSysinfoPdu
+from pytetra.layer import Layer
 
 
-class Mle:
-    def __init__(self, tlasap, tlbsap, lcmcsap):
-        self.tlasap = tlasap
-        self.tlbsap = tlbsap
-        self.lcmcsap = lcmcsap
-        tlasap.register(self)
-        tlbsap.register(self)
-        lcmcsap.register(self)
+class Mle(Layer, UpperTlaSap, UpperTlbSap):
+    def __init__(self, stack):
+        self.stack = stack
 
-    def recv(self, prim):
-        if isinstance(prim, TlSyncIndication):
-            pdu = DMleSyncPdu(prim.sdu)
-        elif isinstance(prim, TlSysinfoIndication):
-            pdu = DMleSysinfoPdu(prim.sdu)
-        elif isinstance(prim, TlUnitdataIndication):
-            pdu = MlePdu(prim.sdu)
+    def tl_unitdata_indication(self, sdu):
+            pdu = MlePdu(sdu)
             if pdu.protocol_discriminator == 2:
-                prim = MleUnitdataIndication(pdu.sdu)
-                self.lcmcsap.send(prim)
+                self.stack.cmce.mle_unitdata_indication(pdu.sdu)
+
+    def tl_sync_indication(self, sdu):
+            pdu = DMleSyncPdu(sdu)
+
+    def tl_sysinfo_indication(self, sdu):
+            pdu = DMleSysinfoPdu(sdu)

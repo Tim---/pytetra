@@ -1,14 +1,11 @@
-from pytetra.layer import Layer
-from pytetra.sap.tpsap import TpSBIndication, TpNDBIndication
 from pytetra.layer.phy.burst import SynchronizationContinuousDownlinkBurst, NormalContinuousDownlinkBurst, SynchronizationDisontinuousDownlinkBurst, NormalDisontinuousDownlinkBurst, TrainingSequenceError
 from pytetra.timebase import g_timebase
+from pytetra.layer import Layer
 
 
 class Phy(Layer):
-    def __init__(self, tpsap):
-        Layer.__init__(self)
-        self.tpsap = tpsap
-        tpsap.register(self)
+    def __init__(self, stack):
+        self.stack = stack
         self.locked = False
         self.stream = []
         self.index = 0
@@ -37,11 +34,9 @@ class Phy(Layer):
         g_timebase.increment()
 
         if cls == SynchronizationContinuousDownlinkBurst:
-            ind = TpSBIndication(burst.SB, burst.BB, burst.BKN2)
-            self.tpsap.send(ind)
+            self.stack.lower_mac.tp_sb_indication(burst.SB, burst.BB, burst.BKN2)
         elif cls == NormalContinuousDownlinkBurst:
-            ind = TpNDBIndication(burst.BB, burst.BKN1, burst.BKN2, burst.SF)
-            self.tpsap.send(ind)
+            self.stack.lower_mac.tp_ndb_indication(burst.BB, burst.BKN1, burst.BKN2, burst.SF)
 
     def feed(self, data):
         self.stream.extend(data)
@@ -54,6 +49,3 @@ class Phy(Layer):
     def delete(self, size):
         del self.stream[:size]
         self.index += size
-
-    def recv(self, prim):
-        pass

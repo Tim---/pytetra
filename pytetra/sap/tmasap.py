@@ -1,11 +1,6 @@
 from .sap import Sap
-from .primitive import Primitive
 
 
-class TmaSap(Sap):
-    pass
-
-
-class TmaUnitdataIndication(Primitive):
-    def __init__(self, sdu):
-        self.sdu = sdu
+class UpperTmaSap(Sap):
+    def tma_unitdata_indication(self, sdu):
+        pass
