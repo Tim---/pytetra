@@ -5,7 +5,7 @@ from pytetra.layer.mle import Mle
 from pytetra.layer.cmce import Cmce
 
 
-class TetraStack:
+class TetraStack(object):
     def __init__(self):
         self.phy = Phy(self)
         self.lower_mac = LowerMac(self)

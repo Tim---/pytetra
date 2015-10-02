@@ -1,10 +1,7 @@
 from pytetra.logger import Logger
 
 
-class Layer:
-    def __init__(self):
-        pass
-
+class Layer(object):
     def warning(self, message):
         Logger.log('%s: %s' % (self.__class__.__name__, message))
 

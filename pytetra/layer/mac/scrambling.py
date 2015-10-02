@@ -1,7 +1,7 @@
 import operator
 
 
-class Scrambler:
+class Scrambler(object):
     def __init__(self):
         self.c = [1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1]
 
@@ -15,7 +15,7 @@ class Scrambler:
     unscramble = scramble
 
 
-class FastScrambler:
+class FastScrambler(object):
     def __init__(self):
         self.c = [1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1]
 

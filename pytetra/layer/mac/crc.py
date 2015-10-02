@@ -1,5 +1,5 @@
 
-class CRC:
+class CRC(object):
     def __init__(self, poly):
         self.poly = poly
 
@@ -18,10 +18,10 @@ class CRC:
 
 class TETRACRC(CRC):
     def __init__(self):
-        CRC.__init__(self, [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
+        super(TETRACRC, self).__init__([0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
 
 
-class FastCrc:
+class FastCrc(object):
     def compute(self, bits):
         crc = [1]*16
         for b in bits:
@@ -32,7 +32,7 @@ class FastCrc:
                 crc[3] = 1 - crc[3]
                 crc[10] = 1 - crc[10]
                 crc[15] = 1 - crc[15]
-        return map(lambda x: 1-x, crc)
+        return map(lambda x: 1 - x, crc)
 
 TETRACRC = FastCrc
 

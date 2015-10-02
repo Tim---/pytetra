@@ -15,7 +15,7 @@ def binDiff(a, b):
     return sum([1 for i, j in zip(a, b) if i != j and i is not None and j is not None])
 
 
-class ConvolutionalEncoder:
+class ConvolutionalEncoder(object):
     def __init__(self, N, K, next_output, next_state):
         self.N = N
         self.K = K
@@ -76,7 +76,7 @@ class ConvolutionalEncoder:
         return res
 
 
-class FastDecoder:
+class FastDecoder(object):
     table = [
         [(0, 0), (1, 1)], [(3, 1), (2, 0)],
         [(4, 0), (5, 1)], [(7, 1), (6, 0)],
@@ -114,7 +114,7 @@ class TETRAConvolutionalEncoder(ConvolutionalEncoder):
             (0, 1), (2, 3), (4, 5), (6, 7),
             (8, 9), (10, 11), (12, 13), (14, 15),
         ]
-        ConvolutionalEncoder.__init__(self, N, K, next_output, next_state)
+        super(TETRAConvolutionalEncoder, self).__init__(N, K, next_output, next_state)
 
 
 # /!\ Extremely inaccurate, use at your own risks /!\

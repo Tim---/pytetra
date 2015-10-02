@@ -1,3 +1,3 @@
 
-class Sap:
+class Sap(object):
     pass

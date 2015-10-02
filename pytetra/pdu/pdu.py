@@ -3,7 +3,7 @@
 from collections import OrderedDict
 
 
-class Field:
+class Field(object):
     pass
 
 

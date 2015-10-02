@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-class Puncturer:
+class Puncturer(object):
     def __init__(self, t, P, f):
         self.t = t
         self.P = P
@@ -18,10 +18,10 @@ class Puncturer:
 
 class Puncturer_2_3(Puncturer):
     def __init__(self):
-        Puncturer.__init__(self, 3, [1, 2, 5], lambda i: i)
+        super(Puncturer_2_3, self).__init__(3, [1, 2, 5], lambda i: i)
 
 
-class FastPuncturer_2_3:
+class FastPuncturer_2_3(object):
     def depuncture(self, bits):
         i = 0
         while i < len(bits):

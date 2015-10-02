@@ -1,7 +1,7 @@
 
 
 # 7.3 Timebase counters
-class Timebase:
+class Timebase(object):
     def __init__(self):
         self.tn = 1  # Timeslot Number
         self.fn = 1  # TDMA Frame Number

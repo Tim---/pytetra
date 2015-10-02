@@ -1,4 +1,3 @@
- * inherit from object
  * improve MAC decoders to be generic, understandable and efficient
  * write a little guide
  * output debugging informations

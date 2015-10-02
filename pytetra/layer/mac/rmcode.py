@@ -24,10 +24,7 @@ G = np.concatenate((I, M), axis=1)
 H = np.concatenate((I, M.transpose()))
 
 
-class ReedMuller:
-    def __init__(self):
-        pass
-
+class ReedMuller(object):
     def check(self, bits):
         return not np.any(np.asarray(bits).dot(H) % 2)
 

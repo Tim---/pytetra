@@ -6,7 +6,7 @@ from pytetra.layer.mac.crc import TETRACRC
 from pytetra.layer.mac.rmcode import ReedMuller
 
 
-class Decoder:
+class Decoder(object):
     def decode(self, b5, scrambling_code):
         # Uncrambling
         b4 = list(self.s.unscramble(b5, scrambling_code))
