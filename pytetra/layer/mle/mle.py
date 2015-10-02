@@ -1,7 +1,6 @@
 from pytetra.sap.tlasap import UpperTlaSap
 from pytetra.sap.tlbsap import UpperTlbSap
-from pytetra.layer.mle.pdu import MlePdu
-from .pdu import DMleSyncPdu, DMleSysinfoPdu
+from pytetra.layer.mle.pdu import MlePdu, DMleSyncPdu, DMleSysinfoPdu
 from pytetra.layer import Layer
 
 

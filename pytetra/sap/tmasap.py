@@ -1,4 +1,4 @@
-from .sap import Sap
+from pytetra.sap import Sap
 
 
 class UpperTmaSap(Sap):
