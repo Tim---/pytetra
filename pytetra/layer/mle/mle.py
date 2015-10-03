@@ -5,9 +5,6 @@ from pytetra.layer import Layer
 
 
 class Mle(Layer, UpperTlaSap, UpperTlbSap):
-    def __init__(self, stack):
-        self.stack = stack
-
     def tl_unitdata_indication(self, sdu):
         pdu = MlePdu(sdu)
         self.info("%s" % (repr(pdu, )))

@@ -5,9 +5,6 @@ from pytetra.layer import Layer
 
 
 class Llc(Layer, UpperTmaSap, UpperTmbSap):
-    def __init__(self, stack):
-        self.stack = stack
-
     def tma_unitdata_indication(self, sdu):
         pdu = LlcPdu(sdu)
         self.info("%s" % (repr(pdu, )))

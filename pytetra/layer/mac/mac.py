@@ -8,7 +8,7 @@ from pytetra.layer import Layer
 
 class LowerMac(Layer, UpperTpSap):
     def __init__(self, stack):
-        self.stack = stack
+        super(LowerMac, self).__init__(stack)
 
         self.mcc = 1
         self.mnc = 1
@@ -76,7 +76,7 @@ class LowerMac(Layer, UpperTpSap):
 
 class UpperMac(Layer, UpperTmvSap):
     def __init__(self, stack):
-        self.stack = stack
+        super(UpperMac, self).__init__(stack)
 
         self.mode = "signalling"
 

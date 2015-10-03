@@ -5,7 +5,7 @@ from pytetra.layer import Layer
 
 class Phy(Layer):
     def __init__(self, stack):
-        self.stack = stack
+        super(Phy, self).__init__(stack)
         self.locked = False
         self.stream = []
         self.index = 0

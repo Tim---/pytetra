@@ -4,9 +4,6 @@ from pytetra.layer import Layer
 
 
 class Mm(Layer, UpperLmmSap):
-    def __init__(self, stack):
-        self.stack = stack
-
     def mle_unitdata_indication(self, sdu):
         pdu = MmPdu(sdu)
         self.info("%s" % (repr(pdu, )))
