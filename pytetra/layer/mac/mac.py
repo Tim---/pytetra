@@ -17,11 +17,11 @@ class LowerMac(Layer, UpperTpSap):
         self.bkn2_stolen = False
 
         self.decoder = {}
-        self.decoder['SCH/F'] = SCHFDecoder()
-        self.decoder['SCH/HD'] = SCHHDDecoder()
-        self.decoder['STCH'] = STCHDecoder()
+        self.decoder['SCH/F'] = SCHFDecoder(self.getExtendedColourCode())
+        self.decoder['SCH/HD'] = SCHHDDecoder(self.getExtendedColourCode())
+        self.decoder['STCH'] = STCHDecoder(self.getExtendedColourCode())
         self.decoder['BSCH'] = BSCHDecoder()
-        self.decoder['AACH'] = AACHDecoder()
+        self.decoder['AACH'] = AACHDecoder(self.getExtendedColourCode())
 
     def tp_sb_indication(self, sb, bb, bkn2):
         self.decodeBSCH(sb)
@@ -47,30 +47,30 @@ class LowerMac(Layer, UpperTpSap):
                     self.decodeTCH(bkn2)
                 self.bkn2_stolen = False
 
-    def getScramblingCode(self):
+    def getExtendedColourCode(self):
         return map(int, '{0:010b}{0:014b}{0:06b}'.format(self.mcc, self.mnc, self.colour_code))
 
     def decodeSCHF(self, b5):
-        b1, crc_pass = self.decoder['SCH/F'].decode(b5, self.getScramblingCode())
+        b1, crc_pass = self.decoder['SCH/F'].decode(b5)
         self.stack.upper_mac.tmv_unitdata_indication(b1, "SCH/F", crc_pass)
 
     def decodeSCHHD(self, b5):
-        b1, crc_pass = self.decoder['SCH/HD'].decode(b5, self.getScramblingCode())
+        b1, crc_pass = self.decoder['SCH/HD'].decode(b5)
         self.stack.upper_mac.tmv_unitdata_indication(b1, "SCH/HD", crc_pass)
 
     def decodeTCH(self, b5):
         pass
 
     def decodeSTCH(self, b5):
-        b1, crc_pass = self.decoder['STCH'].decode(b5, self.getScramblingCode())
+        b1, crc_pass = self.decoder['STCH'].decode(b5)
         self.stack.upper_mac.tmv_unitdata_indication(b1, "STCH", crc_pass)
 
     def decodeBSCH(self, b5):
-        b1, crc_pass = self.decoder['BSCH'].decode(b5, [0] * 30)
+        b1, crc_pass = self.decoder['BSCH'].decode(b5)
         self.stack.upper_mac.tmv_unitdata_indication(b1, "BSCH", crc_pass)
 
     def decodeAACH(self, b5):
-        b1, crc_pass = self.decoder['AACH'].decode(b5, self.getScramblingCode())
+        b1, crc_pass = self.decoder['AACH'].decode(b5)
         self.stack.upper_mac.tmv_unitdata_indication(b1, "AACH", crc_pass)
 
 

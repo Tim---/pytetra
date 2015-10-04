@@ -7,9 +7,9 @@ from pytetra.layer.mac.rmcode import ReedMuller
 
 
 class Decoder(object):
-    def decode(self, b5, scrambling_code):
+    def decode(self, b5):
         # Uncrambling
-        b4 = list(self.s.unscramble(b5, scrambling_code))
+        b4 = list(self.s.unscramble(b5))
 
         # Deinterleaving
         b3 = self.i.deinterleave(b4)
@@ -27,8 +27,8 @@ class Decoder(object):
 
 
 class SCHFDecoder(Decoder):
-    def __init__(self):
-        self.s = Scrambler()
+    def __init__(self, scrambling_code):
+        self.s = Scrambler(scrambling_code)
         self.i = SCHFInterleaver()
         self.p = Puncturer_2_3()
         self.e = TETRAConvolutionalEncoder()
@@ -36,8 +36,8 @@ class SCHFDecoder(Decoder):
 
 
 class SCHHDDecoder(Decoder):
-    def __init__(self):
-        self.s = Scrambler()
+    def __init__(self, scrambling_code):
+        self.s = Scrambler(scrambling_code)
         self.i = HalfInterleaver()
         self.p = Puncturer_2_3()
         self.e = TETRAConvolutionalEncoder()
@@ -46,7 +46,7 @@ class SCHHDDecoder(Decoder):
 
 class BSCHDecoder(Decoder):
     def __init__(self):
-        self.s = Scrambler()
+        self.s = Scrambler([0] * 30)
         self.i = BSCHInterleaver()
         self.p = Puncturer_2_3()
         self.e = TETRAConvolutionalEncoder()
@@ -54,12 +54,12 @@ class BSCHDecoder(Decoder):
 
 
 class AACHDecoder(Decoder):
-    def __init__(self):
-        self.s = Scrambler()
+    def __init__(self, scrambling_code):
+        self.s = Scrambler(scrambling_code)
         self.rm = ReedMuller()
 
-    def decode(self, b5, scrambling_code):
-        b2 = b3 = b4 = list(self.s.unscramble(b5, scrambling_code))
+    def decode(self, b5):
+        b2 = b3 = b4 = list(self.s.unscramble(b5))
         crc_pass = self.rm.check(b2)
         b1 = self.rm.decode(b2)
 
