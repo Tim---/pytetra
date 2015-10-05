@@ -1,23 +1,23 @@
 
-class BlockInterleaver(object):
+class BlockDeinterleaver(object):
     def __init__(self, K, a):
         self.K = K
         self.a = a
 
-    def deinterleave(self, bits):
-        return [bits[(self.a * (i + 1)) % self.K] for i in range(len(bits))]
+    def __call__(self, b4):
+        return [b4[(self.a * (i + 1)) % self.K] for i in range(len(b4))]
 
 
-class BSCHInterleaver(BlockInterleaver):
+class BSCHDeinterleaver(BlockDeinterleaver):
     def __init__(self):
-        super(BSCHInterleaver, self).__init__(120, 11)
+        super(BSCHDeinterleaver, self).__init__(120, 11)
 
 
-class SCHFInterleaver(BlockInterleaver):
+class SCHFDeinterleaver(BlockDeinterleaver):
     def __init__(self):
-        super(SCHFInterleaver, self).__init__(432, 103)
+        super(SCHFDeinterleaver, self).__init__(432, 103)
 
 
-class HalfInterleaver(BlockInterleaver):
+class HalfDeinterleaver(BlockDeinterleaver):
     def __init__(self):
-        super(HalfInterleaver, self).__init__(216, 101)
+        super(HalfDeinterleaver, self).__init__(216, 101)

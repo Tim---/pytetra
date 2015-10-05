@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-class Puncturer(object):
+class Depuncturer(object):
     def __init__(self, t, P, f):
         self.t = t
         self.P = P
@@ -16,29 +16,29 @@ class Puncturer(object):
         return v
 
 
-class Puncturer_2_3(Puncturer):
+class Depuncturer_2_3(Depuncturer):
     def __init__(self):
-        super(Puncturer_2_3, self).__init__(3, [1, 2, 5], lambda i: i)
+        super(Depuncturer_2_3, self).__init__(3, [1, 2, 5], lambda i: i)
 
 
 class FastPuncturer_2_3(object):
-    def depuncture(self, bits):
+    def depuncture(self, b3):
         i = 0
-        while i < len(bits):
-            yield bits[i]
-            yield bits[i + 1]
+        while i < len(b3):
+            yield b3[i]
+            yield b3[i + 1]
             yield None
             yield None
-            yield bits[i + 2]
+            yield b3[i + 2]
             yield None
             yield None
             yield None
             i += 3
 
-Puncturer_2_3 = FastPuncturer_2_3
+Depuncturer_2_3 = FastPuncturer_2_3
 
 if __name__ == "__main__":
     bits = [1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0]
 
-    p = Puncturer_2_3()
+    p = Depuncturer_2_3()
     print list(p.depuncture(bits))

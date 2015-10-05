@@ -1,61 +1,50 @@
-from pytetra.layer.mac.scrambling import Scrambler
-from pytetra.layer.mac.interleaving import BSCHInterleaver, SCHFInterleaver, HalfInterleaver
-from pytetra.layer.mac.puncturer import Puncturer_2_3
-from pytetra.layer.mac.convolutional import TETRAConvolutionalEncoder
-from pytetra.layer.mac.crc import TETRACRC
-from pytetra.layer.mac.rmcode import ReedMuller
+from pytetra.layer.mac.scrambling import Unscrambler
+from pytetra.layer.mac.interleaving import BSCHDeinterleaver, SCHFDeinterleaver, HalfDeinterleaver
+from pytetra.layer.mac.puncturer import Depuncturer_2_3
+from pytetra.layer.mac.convolutional import ConvolutionalDecoder
+from pytetra.layer.mac.crc import CrcChecker
+from pytetra.layer.mac.rmcode import RMDecoder
 
 
 class Decoder(object):
     def decode(self, b5):
-        # Uncrambling
-        b4 = self.s.unscramble(b5)
-
-        # Deinterleaving
-        b3 = self.i.deinterleave(b4)
-
-        # Rate-compatible punctured convolutional codes
-        b2 = self.e.decode(b3)
-
-        # CRC
-        b1, crc_pass = self.c.compute(b2)
-
+        b4 = self.unscramble(b5)
+        b3 = self.deinterleave(b4)
+        b2 = self.convolutional_decode(b3)
+        b1, crc_pass = self.block_decode(b2)
         return b1, crc_pass
 
 
 class SCHFDecoder(Decoder):
-    def __init__(self, scrambling_code):
-        self.s = Scrambler(scrambling_code)
-        self.i = SCHFInterleaver()
-        self.e = TETRAConvolutionalEncoder(Puncturer_2_3())
-        self.c = TETRACRC()
+    def __init__(self, extended_colour_code):
+        self.unscramble = Unscrambler(extended_colour_code)
+        self.deinterleave = SCHFDeinterleaver()
+        self.convolutional_decode = ConvolutionalDecoder(Depuncturer_2_3())
+        self.block_decode = CrcChecker()
 
 
 class SCHHDDecoder(Decoder):
-    def __init__(self, scrambling_code):
-        self.s = Scrambler(scrambling_code)
-        self.i = HalfInterleaver()
-        self.e = TETRAConvolutionalEncoder(Puncturer_2_3())
-        self.c = TETRACRC()
+    def __init__(self, extended_colour_code):
+        self.unscramble = Unscrambler(extended_colour_code)
+        self.deinterleave = HalfDeinterleaver()
+        self.convolutional_decode = ConvolutionalDecoder(Depuncturer_2_3())
+        self.block_decode = CrcChecker()
 
 
 class BSCHDecoder(Decoder):
     def __init__(self):
-        self.s = Scrambler([0] * 30)
-        self.i = BSCHInterleaver()
-        self.e = TETRAConvolutionalEncoder(Puncturer_2_3())
-        self.c = TETRACRC()
+        self.unscramble = Unscrambler([0] * 30)
+        self.deinterleave = BSCHDeinterleaver()
+        self.convolutional_decode = ConvolutionalDecoder(Depuncturer_2_3())
+        self.block_decode = CrcChecker()
 
 
 class AACHDecoder(Decoder):
-    def __init__(self, scrambling_code):
-        self.s = Scrambler(scrambling_code)
-        self.rm = ReedMuller()
+    def __init__(self, extended_colour_code):
+        self.unscramble = Unscrambler(extended_colour_code)
+        self.deinterleave = lambda x: x
+        self.convolutional_decode = lambda x: x
+        self.block_decode = RMDecoder()
 
-    def decode(self, b5):
-        b2 = b3 = b4 = self.s.unscramble(b5)
-        b1, crc_pass = self.rm.compute(b2)
-
-        return b1, crc_pass
 
 STCHDecoder = SCHHDDecoder
