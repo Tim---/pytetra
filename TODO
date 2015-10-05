@@ -1,4 +1,5 @@
  * improve MAC decoders to be generic, understandable and efficient
+  * most important : use a Viterbi algorithm for RCPC
  * write a little guide
  * output debugging informations
  * write tests
