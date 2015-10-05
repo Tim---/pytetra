@@ -23,7 +23,7 @@ class TETRACRC(CRC):
 
 class FastCrc(object):
     def compute(self, bits):
-        crc = [1]*16
+        crc = [1] * 16
         for b in bits:
             c = crc.pop(0) ^ b
             crc.append(0)
@@ -32,7 +32,7 @@ class FastCrc(object):
                 crc[3] = 1 - crc[3]
                 crc[10] = 1 - crc[10]
                 crc[15] = 1 - crc[15]
-        return map(lambda x: 1 - x, crc)
+        return bits[:-16], (crc == [0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1])
 
 TETRACRC = FastCrc
 

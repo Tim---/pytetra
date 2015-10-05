@@ -48,11 +48,9 @@ H = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 
 
 class ReedMuller(object):
-    def check(self, bits):
+    def compute(self, bits):
+        crc_pass = True
         for i in range(14):
             if reduce(operator.xor, (bits[j] * H[j][i] for j in range(30))):
-                return False
-        return True
-
-    def decode(self, bits):
-        return bits[:14]
+                crc_pass = False
+        return bits[:14], crc_pass

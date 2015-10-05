@@ -88,13 +88,17 @@ class FastDecoder(object):
         [(13, 1), (12, 0)], [(14, 0), (15, 1)]
     ]
 
+    def __init__(self, puncturer):
+        self.puncturer = puncturer
+
     def decode(self, bits):
+        bits = list(self.puncturer.depuncture(bits))
         state = 0
         res = []
         for fb in bits[::4]:
             state, out = self.table[state][fb]
             res.append(out)
-        return res
+        return res[:-4]
 
 
 class TETRAConvolutionalEncoder(ConvolutionalEncoder):
@@ -115,7 +119,6 @@ class TETRAConvolutionalEncoder(ConvolutionalEncoder):
             (8, 9), (10, 11), (12, 13), (14, 15),
         ]
         super(TETRAConvolutionalEncoder, self).__init__(N, K, next_output, next_state)
-
 
 # /!\ Extremely inaccurate, use at your own risks /!\
 TETRAConvolutionalEncoder = FastDecoder

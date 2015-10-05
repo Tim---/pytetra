@@ -11,4 +11,4 @@ class Scrambler(object):
         self.p = p[32:]
 
     def unscramble(self, bits):
-        return starmap(xor, izip(bits, self.p))
+        return list(starmap(xor, izip(bits, self.p)))
