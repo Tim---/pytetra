@@ -47,4 +47,4 @@ class AACHDecoder(Decoder):
         self.block_decode = RMDecoder()
 
 
-STCHDecoder = SCHHDDecoder
+BNCHDecoder = STCHDecoder = SCHHDDecoder
