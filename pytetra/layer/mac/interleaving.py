@@ -3,9 +3,10 @@ class BlockDeinterleaver(object):
     def __init__(self, K, a):
         self.K = K
         self.a = a
+        self.shuffle = [(self.a * (i + 1)) % self.K for i in range(self.K)]
 
     def __call__(self, b4):
-        return [b4[(self.a * (i + 1)) % self.K] for i in range(len(b4))]
+        return [b4[i] for i in self.shuffle]
 
 
 class BSCHDeinterleaver(BlockDeinterleaver):
