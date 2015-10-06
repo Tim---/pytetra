@@ -1,4 +1,5 @@
 import operator
+import itertools
 
 G = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0],
      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
@@ -47,10 +48,31 @@ H = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
      [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]]
 
 
+def dot(v, M):
+    for k in range(len(M[0])):
+        yield reduce(operator.xor, (v[i] * M[i][k] for i in range(len(v))))
+
+
 class RMDecoder(object):
+    def __init__(self):
+        # Create the syndromes dictionary
+        self.syndromes = {}
+        errors_generator = itertools.chain(*(itertools.combinations(range(30), i) for i in range(1, 3)))
+        for errors in errors_generator:
+            # s is a vector of 0 < hamming weight <= 2
+            s = tuple(int(i in errors) for i in range(30))
+            # compute the syndrome
+            t = tuple(dot(s, H))
+            self.syndromes[t] = s
+
     def __call__(self, b2):
-        crc_pass = True
-        for i in range(14):
-            if reduce(operator.xor, (b2[j] * H[j][i] for j in range(30))):
-                crc_pass = False
+        # Compute the syndrome, and check correctness (all zeros)
+        syn = tuple(dot(b2, H))
+        crc_pass = not any(syn)
+
+        if not crc_pass and syn in self.syndromes:
+            # If we know the syndrome, less than 3 bits where changed and we try to correct them
+            b2 = list(itertools.starmap(operator.xor, itertools.izip(b2, self.syndromes[syn])))
+            crc_pass = not any(dot(b2, H))
+
         return b2[:14], crc_pass
