@@ -68,9 +68,8 @@ class ConvolutionalDecoder2_3(object):
                 history[2 * i + 1][newstate] = min_index
             oldcost = cost[:]
 
-        def argmin(l):
-            return min(enumerate(l), key=lambda x: x[1])[0]
-        state = argmin(oldcost)
+        # Tail bits to 0 mean we end in state 0 ?
+        state = 0
         res = [0] * len(history)
         for t in xrange(len(history) - 1, - 1, -1):
             oldstate = history[t][state]
