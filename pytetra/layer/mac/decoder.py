@@ -1,7 +1,6 @@
 from pytetra.layer.mac.scrambling import Unscrambler
 from pytetra.layer.mac.interleaving import BSCHDeinterleaver, SCHFDeinterleaver, HalfDeinterleaver
-from pytetra.layer.mac.puncturer import Depuncturer_2_3
-from pytetra.layer.mac.convolutional import ConvolutionalDecoder
+from pytetra.layer.mac.convolutional import ConvolutionalDecoder2_3
 from pytetra.layer.mac.crc import CrcChecker
 from pytetra.layer.mac.rmcode import RMDecoder
 
@@ -19,7 +18,7 @@ class SCHFDecoder(Decoder):
     def __init__(self, extended_colour_code):
         self.unscramble = Unscrambler(extended_colour_code)
         self.deinterleave = SCHFDeinterleaver()
-        self.convolutional_decode = ConvolutionalDecoder(Depuncturer_2_3())
+        self.convolutional_decode = ConvolutionalDecoder2_3()
         self.block_decode = CrcChecker()
 
 
@@ -27,7 +26,7 @@ class SCHHDDecoder(Decoder):
     def __init__(self, extended_colour_code):
         self.unscramble = Unscrambler(extended_colour_code)
         self.deinterleave = HalfDeinterleaver()
-        self.convolutional_decode = ConvolutionalDecoder(Depuncturer_2_3())
+        self.convolutional_decode = ConvolutionalDecoder2_3()
         self.block_decode = CrcChecker()
 
 
@@ -35,7 +34,7 @@ class BSCHDecoder(Decoder):
     def __init__(self):
         self.unscramble = Unscrambler([0] * 30)
         self.deinterleave = BSCHDeinterleaver()
-        self.convolutional_decode = ConvolutionalDecoder(Depuncturer_2_3())
+        self.convolutional_decode = ConvolutionalDecoder2_3()
         self.block_decode = CrcChecker()
 
 

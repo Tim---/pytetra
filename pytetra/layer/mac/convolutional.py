@@ -20,21 +20,21 @@ class ConvolutionalDecoder2_3(object):
     ]
 
     def __init__(self):
-        self.tab1 = [[[self.MAX for i in range(16)] for j in range(16)] for k in range(2)]
+        self.tab1 = [[[] for j in range(16)] for k in range(2)]
         for received in range(2):
             for oldstate in range(16):
                 for input_ in range(2):
                     newstate = self.next_state[oldstate][input_]
                     output = self.next_output[oldstate][input_]
-                    self.tab1[received][oldstate][newstate] = (output >> 3) ^ received
+                    self.tab1[received][newstate].append((oldstate, (output >> 3) ^ received))
 
-        self.tab2 = [[[self.MAX for i in range(16)] for j in range(16)] for k in range(4)]
+        self.tab2 = [[[] for j in range(16)] for k in range(4)]
         for received in range(4):
             for oldstate in range(16):
                 for input_ in range(2):
                     newstate = self.next_state[oldstate][input_]
                     output = self.next_output[oldstate][input_]
-                    self.tab2[received][oldstate][newstate] = ((output >> 3) ^ (received >> 1)) + (((output >> 2) & 1) ^ (received & 1))
+                    self.tab2[received][newstate].append((oldstate, ((output >> 3) ^ (received >> 1)) + (((output >> 2) & 1) ^ (received & 1))))
 
     def __call__(self, b3):
         oldcost = [0] + ([self.MAX] * 15)
@@ -44,28 +44,30 @@ class ConvolutionalDecoder2_3(object):
         for i in xrange(len(b3) / 3):
             received = (b3[3 * i] << 1) | b3[3 * i + 1]
             for newstate in xrange(16):
-                min_ = self.MAX
-                min_index = -1
-                for oldstate in xrange(16):
-                    c = self.tab2[received][oldstate][newstate] + oldcost[oldstate]
-                    if c < min_:
-                        min_ = c
-                        min_index = oldstate
-                cost[newstate] = min_
-                history[2 * i][newstate] = min_index
+                oldstate1, c1 = self.tab2[received][newstate][0]
+                c1 += oldcost[oldstate1]
+                oldstate2, c2 = self.tab2[received][newstate][1]
+                c2 += oldcost[oldstate2]
+                if c1 < c2:
+                    cost[newstate] = c1
+                    history[2 * i][newstate] = oldstate1
+                else:
+                    cost[newstate] = c2
+                    history[2 * i][newstate] = oldstate2
             oldcost = cost[:]
 
             received = b3[3 * i + 2]
             for newstate in xrange(16):
-                min_ = self.MAX
-                min_index = -1
-                for oldstate in xrange(16):
-                    c = self.tab1[received][oldstate][newstate] + oldcost[oldstate]
-                    if c < min_:
-                        min_ = c
-                        min_index = oldstate
-                cost[newstate] = min_
-                history[2 * i + 1][newstate] = min_index
+                oldstate1, c1 = self.tab1[received][newstate][0]
+                c1 += oldcost[oldstate1]
+                oldstate2, c2 = self.tab1[received][newstate][1]
+                c2 += oldcost[oldstate2]
+                if c1 < c2:
+                    cost[newstate] = c1
+                    history[2 * i + 1][newstate] = oldstate1
+                else:
+                    cost[newstate] = c2
+                    history[2 * i + 1][newstate] = oldstate2
             oldcost = cost[:]
 
         # Tail bits to 0 mean we end in state 0 ?
@@ -75,7 +77,7 @@ class ConvolutionalDecoder2_3(object):
             oldstate = history[t][state]
             res[t] = self.next_state[oldstate].index(state)
             state = oldstate
-        return res
+        return res[:-4]
 
 
 # /!\ Inaccurate convolutional decoder /!\
@@ -105,22 +107,44 @@ class ConvolutionalDecoder(object):
 
 
 if __name__ == "__main__":
-    import time
+    def bench_speed():
+        import time
+
+        times = 200
+        start = time.time()
+        for i in range(times):
+            c1(b3)
+        end = time.time()
+        speed1 = 1000. * (end - start) / times
+        print "Fast decoder : %s ms" % (speed1, )
+
+        start = time.time()
+        for i in range(times):
+            c2(b3)
+        end = time.time()
+        speed2 = 1000. * (end - start) / times
+        print "Real decoder : %s ms" % (speed2)
+
+        print "Relative speed : %s%%" % (100 * speed1 / speed2)
+
+    def bench_correction():
+        import random
+        for numerrors in range(5):
+            s = 0
+            for i in range(1000):
+                b3e = b3[:]
+                for x in random.sample(range(len(b3)), numerrors):
+                    b3e[x] ^= 1
+                if c2(b3e) == b2:
+                    s += 1
+            print numerrors, s / 1000.
+
     from pytetra.layer.mac.puncturer import Depuncturer_2_3
     b3 = [1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0]
-    b2 = [1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+    b2 = [1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0]
     c1 = ConvolutionalDecoder(Depuncturer_2_3())
     c2 = ConvolutionalDecoder2_3()
 
-    times = 200
-    start = time.time()
-    for i in range(times):
-        c1(b3)
-    end = time.time()
-    print "Fast decoder : %s ms" % (1000. * (end - start) / times)
+    print c2(b3) == b2
 
-    start = time.time()
-    for i in range(times):
-        c2(b3)
-    end = time.time()
-    print "Real decoder : %s ms" % (1000. * (end - start) / times)
+    bench_correction()
