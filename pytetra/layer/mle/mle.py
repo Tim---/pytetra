@@ -15,6 +15,7 @@ class Mle(Layer, UpperTlaSap, UpperTlbSap):
 
     def tl_sync_indication(self, sdu):
         pdu = DMleSyncPdu(sdu)
+        self.stack.lower_mac.set_mobile_codes(pdu.mcc, pdu.mnc)
         self.info("%s" % (repr(pdu, )))
 
     def tl_sysinfo_indication(self, sdu):

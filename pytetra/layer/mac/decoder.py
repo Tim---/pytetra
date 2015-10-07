@@ -47,3 +47,17 @@ class AACHDecoder(Decoder):
 
 
 BNCHDecoder = STCHDecoder = SCHHDDecoder
+
+
+class Decoders(dict):
+    def __init__(self):
+        self['BSCH'] = BSCHDecoder()
+
+    def decode(self, channel, b5):
+        return self[channel].decode(b5)
+
+    def set_extended_colour_code(self, extended_colour_code):
+        self['SCH/F'] = SCHFDecoder(extended_colour_code)
+        self['SCH/HD'] = SCHHDDecoder(extended_colour_code)
+        self['STCH'] = STCHDecoder(extended_colour_code)
+        self['AACH'] = AACHDecoder(extended_colour_code)

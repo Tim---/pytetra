@@ -1,5 +1,5 @@
 from pytetra.layer.mac.pdu import MacPdu, NullPdu, SyncPdu, AccessAssignPdu, SysinfoPdu
-from pytetra.layer.mac.decoder import SCHFDecoder, SCHHDDecoder, STCHDecoder, BSCHDecoder, AACHDecoder
+from pytetra.layer.mac.decoder import Decoders
 from pytetra.sap.tpsap import UpperTpSap
 from pytetra.sap.tmvsap import UpperTmvSap
 from pytetra.timebase import g_timebase
@@ -10,68 +10,56 @@ class LowerMac(Layer, UpperTpSap):
     def __init__(self, stack):
         super(LowerMac, self).__init__(stack)
 
-        self.mcc = 1
-        self.mnc = 1
-        self.colour_code = 1
+        self.mcc = 0
+        self.mnc = 0
+        self.colour_code = 0
 
         self.bkn2_stolen = False
 
-        self.decoder = {}
-        self.decoder['SCH/F'] = SCHFDecoder(self.getExtendedColourCode())
-        self.decoder['SCH/HD'] = SCHHDDecoder(self.getExtendedColourCode())
-        self.decoder['STCH'] = STCHDecoder(self.getExtendedColourCode())
-        self.decoder['BSCH'] = BSCHDecoder()
-        self.decoder['AACH'] = AACHDecoder(self.getExtendedColourCode())
+        self.decoder = Decoders()
 
     def tp_sb_indication(self, sb, bb, bkn2):
-        self.decodeBSCH(sb)
-        self.decodeAACH(bb)
-        self.decodeSCHHD(bkn2)
+        self.decode("BSCH", sb)
+        self.decode("AACH", bb)
+        self.decode("SCH/HD", bkn2)
 
     def tp_ndb_indication(self, bb, bkn1, bkn2, sf):
-        self.decodeAACH(bb)
+        self.decode("AACH", bb)
         if self.stack.upper_mac.mode == "signalling":
             if sf == 0:
-                self.decodeSCHF(bkn1 + bkn2)
+                self.decode("SCH/F", bkn1 + bkn2)
             else:
-                self.decodeSCHHD(bkn1)
-                self.decodeSCHHD(bkn2)
+                self.decode("SCH/HD", bkn1)
+                self.decode("SCH/HD", bkn2)
         elif self.stack.upper_mac.mode == "traffic":
             if sf == 0:
-                self.decodeTCH(bkn1 + bkn2)
+                self.decode("TCH", bkn1 + bkn2)
             else:
-                self.decodeSTCH(bkn1)
+                self.decode("STCH", bkn1)
                 if self.bkn2_stolen:
-                    self.decodeSTCH(bkn2)
+                    self.decode("STCH", bkn2)
                 else:
-                    self.decodeTCH(bkn2)
+                    self.decode("TCH", bkn2)
                 self.bkn2_stolen = False
 
+    def set_mobile_codes(self, mcc, mnc):
+        if mcc != self.mcc or mnc != self.mnc:
+            self.mcc = mcc
+            self.mnc = mnc
+            self.decoder.set_extended_colour_code(self.getExtendedColourCode())
+
+    def set_colour_code(self, colour_code):
+        if colour_code != self.colour_code:
+            self.colour_code = colour_code
+            self.decoder.set_extended_colour_code(self.getExtendedColourCode())
+
     def getExtendedColourCode(self):
-        return map(int, '{0:010b}{0:014b}{0:06b}'.format(self.mcc, self.mnc, self.colour_code))
+        return map(int, '{0:010b}{1:014b}{2:06b}'.format(self.mcc, self.mnc, self.colour_code))
 
-    def decodeSCHF(self, b5):
-        b1, crc_pass = self.decoder['SCH/F'].decode(b5)
-        self.stack.upper_mac.tmv_unitdata_indication(b1, "SCH/F", crc_pass)
-
-    def decodeSCHHD(self, b5):
-        b1, crc_pass = self.decoder['SCH/HD'].decode(b5)
-        self.stack.upper_mac.tmv_unitdata_indication(b1, "SCH/HD", crc_pass)
-
-    def decodeTCH(self, b5):
-        pass
-
-    def decodeSTCH(self, b5):
-        b1, crc_pass = self.decoder['STCH'].decode(b5)
-        self.stack.upper_mac.tmv_unitdata_indication(b1, "STCH", crc_pass)
-
-    def decodeBSCH(self, b5):
-        b1, crc_pass = self.decoder['BSCH'].decode(b5)
-        self.stack.upper_mac.tmv_unitdata_indication(b1, "BSCH", crc_pass)
-
-    def decodeAACH(self, b5):
-        b1, crc_pass = self.decoder['AACH'].decode(b5)
-        self.stack.upper_mac.tmv_unitdata_indication(b1, "AACH", crc_pass)
+    def decode(self, channel, b5):
+        if channel != "TCH":
+            b1, crc_pass = self.decoder.decode(channel, b5)
+            self.stack.upper_mac.tmv_unitdata_indication(b1, channel, crc_pass)
 
 
 class UpperMac(Layer, UpperTmvSap):
@@ -86,6 +74,7 @@ class UpperMac(Layer, UpperTmvSap):
                 pdu = SyncPdu(block)
                 self.info("%s" % (repr(pdu, )))
                 g_timebase.update(pdu.timeslot_number + 1, pdu.frame_number, pdu.multiframe_number)
+                self.stack.lower_mac.set_colour_code(pdu.colour_code)
                 self.stack.llc.tmb_sync_indication(pdu.tm_sdu)
             elif channel == "AACH":
                 pdu = AccessAssignPdu(block)
