@@ -113,7 +113,7 @@ class Type3(TypeField):
         if m_bit:
             element_identifier = bits.peek_int(1, 4)
             if element_identifier == self.element.identifier:
-                bits.forward(5)
+                bits.read(5)
                 length = bits.read_int(11)
                 parent.add_field(self.element(bits))
 
@@ -127,7 +127,7 @@ class Type4(TypeField):
         if m_bit:
             element_identifier = bits.peek_int(1, 4)
             if element_identifier == self.element.identifier:
-                bits.forward(5)
+                bits.read(5)
                 length = bits.read_int(11)
                 repeat = bits.read_int(6)
                 parent.add_field([self.element(bits) for r in range(repeat)])
