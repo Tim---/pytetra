@@ -3,6 +3,28 @@
 from collections import OrderedDict
 
 
+class Bits(object):
+    def __init__(self, bits):
+        self.bits = bits
+
+    def __repr__(self):
+        return self.bits
+
+    def read(self, size):
+        res, self.bits = Bits(self.bits[:size]), self.bits[size:]
+        return res
+
+    def read_int(self, size):
+        res, self.bits = int(self.bits[:size], 2), self.bits[size:]
+        return res
+
+    def __len__(self):
+        return len(self.bits)
+
+    def __getitem__(self, key):
+        return Bits(self.bits[key])
+
+
 class Field(object):
     pass
 
@@ -13,9 +35,7 @@ class UIntField(Field):
         self.sz = sz
 
     def dissect(self, pkt, bits):
-        res = int(''.join(map(str, bits[:self.sz])), 2)
-        del bits[:self.sz]
-        return res
+        return bits.read_int(self.sz)
 
 
 class BitsField(Field):
@@ -25,9 +45,7 @@ class BitsField(Field):
 
     def dissect(self, pkt, bits):
         sz = self.sz or len(bits)
-        res = bits[:sz]
-        del bits[:sz]
-        return res
+        return bits.read(sz)
 
 
 class ConditionalField(Field):
@@ -67,9 +85,7 @@ class Type1Field(Pdu):
         self.size = size
 
     def dissect(self, bits):
-        res = binToInt(bits[:self.size])
-        del bits[:self.size]
-        return res
+        return bits.read_int(self.size)
 
 
 class Type2Field(Pdu):
@@ -79,9 +95,7 @@ class Type2Field(Pdu):
         self.cond = cond
 
     def dissect(self, bits):
-        res = binToInt(bits[:self.size])
-        del bits[:self.size]
-        return res
+        return bits.read_int(self.size)
 
 
 class Type3Field(Pdu):
@@ -90,9 +104,7 @@ class Type3Field(Pdu):
         self.identifier = identifier
 
     def dissect(self, bits, length):
-        res = binToInt(bits[:length])
-        del bits[:length]
-        return res
+        return bits.read_int(length)
 
 
 class Type4Field(Pdu):
@@ -103,18 +115,12 @@ class Type4Field(Pdu):
     def dissect(self, bits, length, repetitions):
         res = []
         for i in range(repetitions):
-            res.append(binToInt(bits[:length]))
-            del bits[:length]
+            res.append(bits.read_int(length))
         return res
 
 
 # E.1 PDU encoding rules for CMCE, MM and SNDCP PDUs
 class TypedPdu(Pdu):
-    def read(self, size):
-        res = binToInt(self.bits[:size])
-        del self.bits[:size]
-        return res
-
     def __init__(self, bits):
         self.bits = bits
 
@@ -125,26 +131,26 @@ class TypedPdu(Pdu):
             self.fields[field.name] = field.dissect(self.bits)
 
         # Type 2
-        obit = self.read(1)
+        obit = self.bits.read_int(1)
         if obit:
             for field in self.type2:
                 if field.cond:
                     pbit = field.cond(self)
                 else:
-                    pbit = self.read(1)
+                    pbit = self.bits.read_int(1)
                 if pbit:
                     self.fields[field.name] = field.dissect(self.bits)
 
             # Type 3/4
-            mbit = self.read(1)
+            mbit = self.bits.read_int(1)
             while mbit:
-                identifier = self.read(4)
-                length = self.read(11)
+                identifier = self.bits.read_int(4)
+                length = self.bits.read_int(11)
                 for field in self.type3:
                     if field.identifier == identifier:
                         self.fields[field.name] = field.dissect(self.bits, length)
                 for field in self.type4:
                     if field.identifier == identifier:
-                        repetitions = self.read(6)
+                        repetitions = self.bits.read_int(6)
                         self.fields[field.name] = field.dissect(self.bits, length, repetitions)
-                mbit = self.read(1)
+                mbit = self.bits.read_int(1)

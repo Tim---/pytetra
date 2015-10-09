@@ -4,6 +4,7 @@ from pytetra.sap.tpsap import UpperTpSap
 from pytetra.sap.tmvsap import UpperTmvSap
 from pytetra.timebase import g_timebase
 from pytetra.layer import Layer
+from pytetra.pdu import Bits
 
 
 class LowerMac(Layer, UpperTpSap):
@@ -59,7 +60,7 @@ class LowerMac(Layer, UpperTpSap):
     def decode(self, channel, b5):
         if channel != "TCH":
             b1, crc_pass = self.decoder.decode(channel, b5)
-            self.stack.upper_mac.tmv_unitdata_indication(b1, channel, crc_pass)
+            self.stack.upper_mac.tmv_unitdata_indication(Bits(''.join(map(str, b1))), channel, crc_pass)
 
 
 class UpperMac(Layer, UpperTmvSap):

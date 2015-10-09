@@ -77,8 +77,8 @@ class MacResourcePdu(Pdu):
         self.fields['sdu'] = BitsField('sdu', sduSize).dissect(self, bits)
         if self.fill_bits_indication:
             while self.sdu[-1] == '0':
-                del self.sdu[-1]
-            del self.sdu[-1]
+                self.sdu = self.sdu[:-1]
+            self.sdu = self.sdu[:-1]
 
 
 # 21.4.4 TMB-SAP: MAC PDU structure for broadcast
