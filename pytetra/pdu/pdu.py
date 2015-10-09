@@ -18,6 +18,9 @@ class Bits(object):
         res, self.bits = int(self.bits[:size], 2), self.bits[size:]
         return res
 
+    def peek_int(self, start, size):
+        return int(self.bits[start:start + size], 2)
+
     def __len__(self):
         return len(self.bits)
 
