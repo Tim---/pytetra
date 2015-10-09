@@ -68,12 +68,12 @@ class Pdu(CompoundElement):
 
 
 class PduDiscriminator(Pdu):
-    length = None
+    element = None
     pdu_types = None
 
     def __new__(cls, bits):
-        t = bits.peek_int(0, cls.length)
-        return cls.pdu_types[t](bits) if t in cls.pdu_types else None
+        t = bits.peek_int(0, cls.element.length)
+        return cls.pdu_types[t](bits) if t in cls.pdu_types else bits
 
 
 class TypeField(object):

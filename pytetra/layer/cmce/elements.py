@@ -1,6 +1,11 @@
 from pytetra.pdu.sublayer32pdu import LeafElement, CompoundElement, Type1, Type2, Type3
 
 
+class PduType(LeafElement):
+    name = "PDU Type"
+    length = 5
+
+
 class CallIdentifier(LeafElement):
     name = "Call identifier"
     length = 14
@@ -16,8 +21,8 @@ class HookMethodSelection(LeafElement):
     length = 1
 
 
-class SimplexDuplex(LeafElement):
-    name = "Simplex/Duplex"
+class SimplexDuplexSelection(LeafElement):
+    name = "Simplex/duplex selection"
     length = 1
 
 
@@ -66,8 +71,8 @@ class SpeechService(LeafElement):
     length = 2
 
 
-class BasicServiceInfos(CompoundElement):
-    name = "Basic service infos"
+class BasicServiceInformation(CompoundElement):
+    name = "Basic service information"
     type1 = [
         Type1(CircuitModeType),
         Type1(EncryptionFlag),
@@ -127,3 +132,13 @@ class DmMsAddress(LeafElement):
 class DisconnectCause(LeafElement):
     name = "Disconnect cause"
     length = 5
+
+
+class CallTimeoutSetUpPhase(LeafElement):
+    name = "Call time-out, set-up phase"
+    length = 3
+
+
+class CallStatus(LeafElement):
+    name = "Call status"
+    length = 3

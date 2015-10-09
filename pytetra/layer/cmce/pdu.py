@@ -9,17 +9,18 @@ class DConnect(Pdu):
     name = "D-CONNECT"
 
     type1 = [
+        Type1(PduType),
         Type1(CallIdentifier),
         Type1(CallTimeout),
         Type1(HookMethodSelection),
-        Type1(SimplexDuplex),
+        Type1(SimplexDuplexSelection),
         Type1(TxGrant),
         Type1(TxReqPerm),
         Type1(CallOwnership),
     ]
     type2 = [
         Type2(CallPriority),
-        Type2(BasicServiceInfos),
+        Type2(BasicServiceInformation),
         Type2(TemporaryAddress),
         Type2(NotificationIndicator),
     ]
@@ -34,6 +35,7 @@ class DRelease(Pdu):
     name = "D-RELEASE"
 
     type1 = [
+        Type1(PduType),
         Type1(CallIdentifier),
         Type1(DisconnectCause),
     ]
@@ -51,11 +53,12 @@ class DSetup(Pdu):
     name = "D-SETUP"
 
     type1 = [
+        Type1(PduType),
         Type1(CallIdentifier),
         Type1(CallTimeout),
         Type1(HookMethodSelection),
-        Type1(SimplexDuplex),
-        Type1(BasicServiceInfos),
+        Type1(SimplexDuplexSelection),
+        Type1(BasicServiceInformation),
         Type1(TxGrant),
         Type1(TxReqPerm),
         Type1(CallPriority),
@@ -80,6 +83,7 @@ class DTxCeased(Pdu):
     name = "D-TX CEASED"
 
     type1 = [
+        Type1(PduType),
         Type1(CallIdentifier),
         Type1(TxReqPerm),
     ]
@@ -92,10 +96,32 @@ class DTxCeased(Pdu):
     ]
 
 
+# 14.7.1.2 D-CALL PROCEEDING
+class DCallProceeding(Pdu):
+    name = "D-CALL PROCEEDING"
+
+    type1 = [
+        Type1(PduType),
+        Type1(CallIdentifier),
+        Type1(CallTimeoutSetUpPhase),
+        Type1(HookMethodSelection),
+    ]
+    type2 = [
+        Type2(BasicServiceInformation),
+        Type2(CallStatus),
+        Type2(NotificationIndicator),
+    ]
+    type34 = [
+        Type3(Facility),
+        Type3(Proprietary),
+    ]
+
+
 # 14.8.28 PDU type
 class CmcePdu(PduDiscriminator):
-    length = 5
+    element = PduType
     pdu_types = {
+        1: DCallProceeding,
         2: DConnect,
         6: DRelease,
         7: DSetup,
@@ -106,14 +132,17 @@ class CmcePdu(PduDiscriminator):
 if __name__ == "__main__":
     from pytetra.pdu.pdu import Bits
 
-    bits = Bits('0000000000011001110000000')
-    print DConnect(bits)
+    bits = Bits('000100000000000011001110000000')
+    print CmcePdu(bits)
 
-    bits = Bits('000000000001100111000000010011000001001010000000000000000011001010')
-    print DSetup(bits)
+    bits = Bits('00111000000000001100111000000010011000001001010000000000000000011001010')
+    print CmcePdu(bits)
 
-    bits = Bits('00000000000110011100100')
-    print DRelease(bits)
+    bits = Bits('0011000000000000110011100100')
+    print CmcePdu(bits)
 
-    bits = Bits('0000000000011000')
-    print DTxCeased(bits)
+    bits = Bits('010010000000000011000')
+    print CmcePdu(bits)
+
+    bits = Bits('0000100000000000110110000100')
+    print CmcePdu(bits)
