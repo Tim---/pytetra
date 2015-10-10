@@ -10,7 +10,8 @@ class LocationUpdateAcceptType(LeafElement):
     name = "Location update accept type"
     length = 3
 
-    def value(self):
+    @classmethod
+    def parseValue(cls, bits):
         return [
             "Roaming location updating",
             "Temporary registration",
@@ -20,7 +21,7 @@ class LocationUpdateAcceptType(LeafElement):
             "Migrating or call restoration migrating location updating",
             "Demand location updating (D-Location Update command received)",
             "Disabled MS updating",
-        ][self._value]
+        ][bits]
 
 
 class Ssi(LeafElement):
@@ -119,8 +120,9 @@ class GroupIdentityAcceptReject(LeafElement):
     name = "Group identity accept/reject"
     length = 1
 
-    def value(self):
-        return ["accept", "reject"][self._value]
+    @classmethod
+    def parseValue(cls, bits):
+        return ["accept", "reject"][bits]
 
 
 class Reserved(LeafElement):
@@ -132,8 +134,9 @@ class GroupIdentityAttachDetachTypeIdentifier(LeafElement):
     name = "Group identity attach/detach type identifier"
     length = 1
 
-    def value(self):
-        return ["attach", "detach"][self._value]
+    @classmethod
+    def parseValue(cls, bits):
+        return ["attach", "detach"][bits]
 
 
 class GroupIdentityAttachmentLifetime(LeafElement):
@@ -166,8 +169,9 @@ class GroupIdentityAddressType(LeafElement):
     name = "Group identity address type"
     length = 2
 
-    def value(self):
-        return ["GSSI", "GTSI", "(V)GSSI", "GTSI+(V)GSSI"][self._value]
+    @classmethod
+    def parseValue(cls, bits):
+        return ["GSSI", "GTSI", "(V)GSSI", "GTSI+(V)GSSI"][bits]
 
 
 class Gssi(LeafElement):
@@ -186,12 +190,12 @@ class GroupIdentityDownlink(CompoundElement):
 
     type1 = [
         Type1(GroupIdentityAttachDetachTypeIdentifier),
-        Type1(GroupIdentityAttachment, cond=lambda elem: elem["Group identity attach/detach type identifier"].value() == "attach"),
-        Type1(GroupIdentityDetachmentDownlink, cond=lambda elem: elem["Group identity attach/detach type identifier"].value() == "detach"),
+        Type1(GroupIdentityAttachment, cond=lambda elem: elem["Group identity attach/detach type identifier"].value == "attach"),
+        Type1(GroupIdentityDetachmentDownlink, cond=lambda elem: elem["Group identity attach/detach type identifier"].value == "detach"),
         Type1(GroupIdentityAddressType),
-        Type1(Gssi, cond=lambda elem: elem["Group identity address type"].value() in ["GSSI", "GTSI", "GTSI+(V)GSSI"]),
-        Type1(AddressExtension, cond=lambda elem: elem["Group identity address type"].value() in ["GTSI", "GTSI+(V)GSSI"]),
-        Type1(VGssi, cond=lambda elem: elem["Group identity address type"].value() in ["(V)GSSI", "GTSI+(V)GSSI"]),
+        Type1(Gssi, cond=lambda elem: elem["Group identity address type"].value in ["GSSI", "GTSI", "GTSI+(V)GSSI"]),
+        Type1(AddressExtension, cond=lambda elem: elem["Group identity address type"].value in ["GTSI", "GTSI+(V)GSSI"]),
+        Type1(VGssi, cond=lambda elem: elem["Group identity address type"].value in ["(V)GSSI", "GTSI+(V)GSSI"]),
     ]
     type2 = []
     type34 = []

@@ -26,6 +26,7 @@ class DLocationUpdateAccept(Pdu):
         Type3(Proprietary),
     ]
 
+
 # 16.10.39 PDU type
 class MmPdu(PduDiscriminator):
     element = PduType

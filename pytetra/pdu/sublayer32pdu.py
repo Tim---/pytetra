@@ -8,24 +8,34 @@ class Element(object):
     name = None
     identifier = None
 
-    def __init__(self, bits):
+    def __repr__(self):
         raise NotImplementedError
 
-    def __repr__(self):
+    @classmethod
+    def parse(cls, bits):
         raise NotImplementedError
 
 
 class LeafElement(Element):
     length = None
 
-    def __init__(self, bits):
-        self._value = bits.read_int(self.length)
+    def __init__(self, value):
+        self.value = value
 
     def __repr__(self):
-        return '"%s" = %s' % (self.name, self.value())
+        return '%s(%s)' % (self.__class__.__name__, repr(self.value))
 
-    def value(self):
-        return self._value
+    @classmethod
+    def parseValue(cls, bits):
+        return bits
+
+    @classmethod
+    def parse(cls, bits):
+        return cls(cls.parseValue(bits.read_int(cls.length)))
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.value == other.value
 
 
 class CompoundElement(Element):
@@ -33,22 +43,30 @@ class CompoundElement(Element):
     type2 = None
     type34 = None
 
-    def __init__(self, bits):
+    def __init__(self, *args):
         self.fields = OrderedDict()
+        for elem in args:
+            self.add_field(elem)
 
-        for elem in self.type1:
-            elem.decode(self, bits)
+    @classmethod
+    def parse(cls, bits):
+        compound_element = cls()
 
-        if self.type2 or self.type34:
+        for elem in compound_element.type1:
+            elem.decode(compound_element, bits)
+
+        if compound_element.type2 or compound_element.type34:
             o_bit = bits.read_int(1)
             if o_bit:
-                for elem in self.type2:
-                    elem.decode(self, bits)
+                for elem in compound_element.type2:
+                    elem.decode(compound_element, bits)
 
-                if self.type34:
-                    for elem in self.type34:
-                        elem.decode(self, bits)
+                if compound_element.type34:
+                    for elem in compound_element.type34:
+                        elem.decode(compound_element, bits)
                     m_bit = bits.read_int(1)
+
+        return compound_element
 
     def add_field(self, field):
         if isinstance(field, list):
@@ -60,7 +78,12 @@ class CompoundElement(Element):
         return self.fields[item]
 
     def __repr__(self):
-        return '<' + self.name + ' ' + ', '.join(map(repr, self.fields.values())) + '>'
+        return self.__class__.__name__ + '(' + ', '.join(map(repr, self.fields.values())) + ')'
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.fields == other.fields
+        return False
 
 
 class Pdu(CompoundElement):
@@ -71,9 +94,10 @@ class PduDiscriminator(Pdu):
     element = None
     pdu_types = None
 
-    def __new__(cls, bits):
+    @classmethod
+    def parse(cls, bits):
         t = bits.peek_int(0, cls.element.length)
-        return cls.pdu_types[t](bits) if t in cls.pdu_types else bits
+        return cls.pdu_types[t].parse(bits) if t in cls.pdu_types else bits
 
 
 class TypeField(object):
@@ -87,7 +111,7 @@ class Type1(TypeField):
 
     def decode(self, parent, bits):
         if self.cond is None or self.cond(parent):
-            parent.add_field(self.element(bits))
+            parent.add_field(self.element.parse(bits))
 
 
 class Type2(TypeField):
@@ -99,9 +123,9 @@ class Type2(TypeField):
         if self.cond is None:
             p_bit = bits.read_int(1)
             if p_bit:
-                parent.add_field(self.element(bits))
+                parent.add_field(self.element.parse(bits))
         elif self.cond(parent):
-            parent.add_field(self.element(bits))
+            parent.add_field(self.element.parse(bits))
 
 
 class Type3(TypeField):
@@ -115,7 +139,7 @@ class Type3(TypeField):
             if element_identifier == self.element.identifier:
                 bits.read(5)
                 length = bits.read_int(11)
-                parent.add_field(self.element(bits))
+                parent.add_field(self.element.parse(bits))
 
 
 class Type4(TypeField):
@@ -130,4 +154,4 @@ class Type4(TypeField):
                 bits.read(5)
                 length = bits.read_int(11)
                 repeat = bits.read_int(6)
-                parent.add_field([self.element(bits) for r in range(repeat)])
+                parent.add_field([self.element.parse(bits) for r in range(repeat)])
