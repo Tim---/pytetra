@@ -1,40 +1,36 @@
-from pytetra.pdu.sublayer32pdu import LeafElement, CompoundElement, Type1, Type2, Type4
+from pytetra.pdu.sublayer32pdu import IntElement, EnumElement, CompoundElement, Type1, Type2, Type4
 
 
-class PduType(LeafElement):
+class PduType(IntElement):
     name = "PDU Type"
     length = 4
 
 
-class LocationUpdateAcceptType(LeafElement):
+class LocationUpdateAcceptType(EnumElement):
     name = "Location update accept type"
     length = 3
+    enum = [
+        "Roaming location updating",
+        "Temporary registration",
+        "Periodic location updating",
+        "ITSI attach",
+        "Call restoration roaming location updating",
+        "Migrating or call restoration migrating location updating",
+        "Demand location updating (D-Location Update command received)",
+        "Disabled MS updating"
+    ]
 
-    @classmethod
-    def parseValue(cls, bits):
-        return [
-            "Roaming location updating",
-            "Temporary registration",
-            "Periodic location updating",
-            "ITSI attach",
-            "Call restoration roaming location updating",
-            "Migrating or call restoration migrating location updating",
-            "Demand location updating (D-Location Update command received)",
-            "Disabled MS updating",
-        ][bits]
-
-
-class Ssi(LeafElement):
+class Ssi(IntElement):
     name = "SSI"
     length = 24
 
 
-class Mcc(LeafElement):
+class Mcc(IntElement):
     name = "MCC"
     length = 10
 
 
-class Mnc(LeafElement):
+class Mnc(IntElement):
     name = "MNC"
     length = 14
 
@@ -50,22 +46,22 @@ class AddressExtension(CompoundElement):
     type34 = []
 
 
-class SubscriberClass(LeafElement):
+class SubscriberClass(IntElement):
     name = "Subscriber class"
     length = 16
 
 
-class EnergySavingMode(LeafElement):
+class EnergySavingMode(IntElement):
     name = "Energy saving mode"
     length = 3
 
 
-class ScchInformation(LeafElement):
+class ScchInformation(IntElement):
     name = "SCCH information"
     length = 4
 
 
-class DistributionOn18thFrame(LeafElement):
+class DistributionOn18thFrame(IntElement):
     name = "Distribution on 18th frame"
     length = 2
 
@@ -81,22 +77,22 @@ class ScchInformationAndDistributionOn18thFrame(CompoundElement):
     type34 = []
 
 
-class LaTimer(LeafElement):
+class LaTimer(IntElement):
     name = "LA timer"
     length = 3
 
 
-class La(LeafElement):
+class La(IntElement):
     name = "LA"
     length = 14
 
 
-class Lacc(LeafElement):
+class Lacc(IntElement):
     name = "Location Area Country Code"
     length = 10
 
 
-class Lanc(LeafElement):
+class Lanc(IntElement):
     name = "Location Area Network Code"
     length = 14
 
@@ -116,35 +112,29 @@ class NewRegisteredArea(CompoundElement):
     type34 = []
 
 
-class GroupIdentityAcceptReject(LeafElement):
+class GroupIdentityAcceptReject(EnumElement):
     name = "Group identity accept/reject"
     length = 1
-
-    @classmethod
-    def parseValue(cls, bits):
-        return ["accept", "reject"][bits]
+    enum = ["accept", "reject"]
 
 
-class Reserved(LeafElement):
+class Reserved(IntElement):
     name = "Reserved"
     length = 1
 
 
-class GroupIdentityAttachDetachTypeIdentifier(LeafElement):
+class GroupIdentityAttachDetachTypeIdentifier(EnumElement):
     name = "Group identity attach/detach type identifier"
     length = 1
-
-    @classmethod
-    def parseValue(cls, bits):
-        return ["attach", "detach"][bits]
+    enum = ["attach", "detach"]
 
 
-class GroupIdentityAttachmentLifetime(LeafElement):
+class GroupIdentityAttachmentLifetime(IntElement):
     name = "Group identity attachment lifetime"
     length = 2
 
 
-class ClassOfUsage(LeafElement):
+class ClassOfUsage(IntElement):
     name = "Class of Usage"
     length = 3
 
@@ -160,26 +150,23 @@ class GroupIdentityAttachment(CompoundElement):
     type34 = []
 
 
-class GroupIdentityDetachmentDownlink(LeafElement):
+class GroupIdentityDetachmentDownlink(IntElement):
     name = "Group identity detachment downlink"
     length = 2
 
 
-class GroupIdentityAddressType(LeafElement):
+class GroupIdentityAddressType(EnumElement):
     name = "Group identity address type"
     length = 2
-
-    @classmethod
-    def parseValue(cls, bits):
-        return ["GSSI", "GTSI", "(V)GSSI", "GTSI+(V)GSSI"][bits]
+    enum = ["GSSI", "GTSI", "(V)GSSI", "GTSI+(V)GSSI"]
 
 
-class Gssi(LeafElement):
+class Gssi(IntElement):
     name = "GSSI"
     length = 24
 
 
-class VGssi(LeafElement):
+class VGssi(IntElement):
     name = "(V)GSSI"
     length = 24
 
@@ -190,12 +177,12 @@ class GroupIdentityDownlink(CompoundElement):
 
     type1 = [
         Type1(GroupIdentityAttachDetachTypeIdentifier),
-        Type1(GroupIdentityAttachment, cond=lambda elem: elem["Group identity attach/detach type identifier"].value == "attach"),
-        Type1(GroupIdentityDetachmentDownlink, cond=lambda elem: elem["Group identity attach/detach type identifier"].value == "detach"),
+        Type1(GroupIdentityAttachment, cond=lambda elem: elem[GroupIdentityAttachDetachTypeIdentifier].value == "attach"),
+        Type1(GroupIdentityDetachmentDownlink, cond=lambda elem: elem[GroupIdentityAttachDetachTypeIdentifier].value == "detach"),
         Type1(GroupIdentityAddressType),
-        Type1(Gssi, cond=lambda elem: elem["Group identity address type"].value in ["GSSI", "GTSI", "GTSI+(V)GSSI"]),
-        Type1(AddressExtension, cond=lambda elem: elem["Group identity address type"].value in ["GTSI", "GTSI+(V)GSSI"]),
-        Type1(VGssi, cond=lambda elem: elem["Group identity address type"].value in ["(V)GSSI", "GTSI+(V)GSSI"]),
+        Type1(Gssi, cond=lambda elem: elem[GroupIdentityAddressType].value in ["GSSI", "GTSI", "GTSI+(V)GSSI"]),
+        Type1(AddressExtension, cond=lambda elem: elem[GroupIdentityAddressType].value in ["GTSI", "GTSI+(V)GSSI"]),
+        Type1(VGssi, cond=lambda elem: elem[GroupIdentityAddressType].value in ["(V)GSSI", "GTSI+(V)GSSI"]),
     ]
     type2 = []
     type34 = []
@@ -215,16 +202,16 @@ class GroupIdendtityLocationAccept(CompoundElement):
     ]
 
 
-class DefaultGroupAttachementLifetime(LeafElement):
+class DefaultGroupAttachementLifetime(IntElement):
     name = "Default group attachment lifetime"
     length = 2
 
 
-class AuthenticationDownlink(LeafElement):
+class AuthenticationDownlink(IntElement):
     name = "Authentication Downlink"
     length = None  # TODO
 
 
-class Proprietary(LeafElement):
+class Proprietary(IntElement):
     name = "Proprietary"
     length = None  # TODO

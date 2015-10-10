@@ -1,72 +1,72 @@
-from pytetra.pdu.sublayer32pdu import LeafElement, CompoundElement, Type1, Type2, Type3
+from pytetra.pdu.sublayer32pdu import IntElement, EnumElement, CompoundElement, Type1, Type2, Type3
 
 
-class PduType(LeafElement):
+class PduType(IntElement):
     name = "PDU Type"
     length = 5
 
 
-class CallIdentifier(LeafElement):
+class CallIdentifier(IntElement):
     name = "Call identifier"
     length = 14
 
 
-class CallTimeout(LeafElement):
+class CallTimeout(IntElement):
     name = "Call timeout"
     length = 4
 
 
-class HookMethodSelection(LeafElement):
+class HookMethodSelection(IntElement):
     name = "Hook method selection"
     length = 1
 
 
-class SimplexDuplexSelection(LeafElement):
+class SimplexDuplexSelection(IntElement):
     name = "Simplex/duplex selection"
     length = 1
 
 
-class TxGrant(LeafElement):
+class TxGrant(IntElement):
     name = "Tx grant"
     length = 2
 
 
-class TxReqPerm(LeafElement):
+class TxReqPerm(IntElement):
     name = "Tx req perm"
     length = 1
 
 
-class CallOwnership(LeafElement):
+class CallOwnership(IntElement):
     name = "Call ownership"
     length = 1
 
 
-class CallPriority(LeafElement):
+class CallPriority(IntElement):
     name = "Call priority"
     length = 4
 
 
-class CircuitModeType(LeafElement):
+class CircuitModeType(IntElement):
     name = "Circuit mode type"
     length = 3
 
 
-class EncryptionFlag(LeafElement):
+class EncryptionFlag(IntElement):
     name = "Encryption flag"
     length = 1
 
 
-class CommunicationType(LeafElement):
+class CommunicationType(IntElement):
     name = "Communication type"
     length = 2
 
 
-class SlotsPerFrame(LeafElement):
+class SlotsPerFrame(IntElement):
     name = "Slots per frame"
     length = 2
 
 
-class SpeechService(LeafElement):
+class SpeechService(IntElement):
     name = "Speech service"
     length = 2
 
@@ -84,61 +84,61 @@ class BasicServiceInformation(CompoundElement):
     type34 = []
 
 
-class TemporaryAddress(LeafElement):
+class TemporaryAddress(IntElement):
     name = "Temporary address"
     length = 24
 
 
-class NotificationIndicator(LeafElement):
+class NotificationIndicator(IntElement):
     name = "Notification indicator"
     length = 6
 
 
-class Facility(LeafElement):
+class Facility(IntElement):
     name = "Facility"
     length = None
 
 
-class Proprietary(LeafElement):
+class Proprietary(IntElement):
     name = "Proprietary"
     length = None
 
 
-class CallingPartyTypeIdentifier(LeafElement):
+class CallingPartyTypeIdentifier(IntElement):
     name = "Calling party type identifier"
     length = 2
 
 
-class CallingPartyAddressSsi(LeafElement):
+class CallingPartyAddressSsi(IntElement):
     name = "Calling party address SSI"
     length = 24
 
 
-class CallingPartyExtension(LeafElement):
+class CallingPartyExtension(IntElement):
     name = "Calling party extension"
     length = 24
 
 
-class ExternalSubscriberNumber(LeafElement):
+class ExternalSubscriberNumber(IntElement):
     name = "External subscriber number"
     length = None
 
 
-class DmMsAddress(LeafElement):
+class DmMsAddress(IntElement):
     name = "DM-MS address"
     length = None
 
 
-class DisconnectCause(LeafElement):
+class DisconnectCause(IntElement):
     name = "Disconnect cause"
     length = 5
 
 
-class CallTimeoutSetUpPhase(LeafElement):
+class CallTimeoutSetUpPhase(IntElement):
     name = "Call time-out, set-up phase"
     length = 3
 
 
-class CallStatus(LeafElement):
+class CallStatus(IntElement):
     name = "Call status"
     length = 3

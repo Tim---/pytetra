@@ -25,17 +25,27 @@ class LeafElement(Element):
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, repr(self.value))
 
-    @classmethod
-    def parseValue(cls, bits):
-        return bits
-
-    @classmethod
-    def parse(cls, bits):
-        return cls(cls.parseValue(bits.read_int(cls.length)))
-
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.value == other.value
+
+
+class IntElement(LeafElement):
+    @classmethod
+    def parse(cls, bits):
+        return cls(bits.read_int(cls.length))
+
+
+class BitsElement(LeafElement):
+    @classmethod
+    def parse(cls, bits):
+        return cls(bits.read(cls.length))
+
+
+class EnumElement(LeafElement):
+    @classmethod
+    def parse(cls, bits):
+        return cls(cls.enum[bits.read_int(cls.length)])
 
 
 class CompoundElement(Element):
@@ -70,9 +80,9 @@ class CompoundElement(Element):
 
     def add_field(self, field):
         if isinstance(field, list):
-            self.fields[field[0].name] = field
+            self.fields[field[0].__class__] = field
         else:
-            self.fields[field.name] = field
+            self.fields[field.__class__] = field
 
     def __getitem__(self, item):
         return self.fields[item]
