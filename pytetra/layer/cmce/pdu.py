@@ -127,22 +127,3 @@ class CmcePdu(PduDiscriminator):
         7: DSetup,
         9: DTxCeased,
     }
-
-
-if __name__ == "__main__":
-    from pytetra.pdu.pdu import Bits
-
-    bits = Bits('000100000000000011001110000000')
-    print CmcePdu(bits)
-
-    bits = Bits('00111000000000001100111000000010011000001001010000000000000000011001010')
-    print CmcePdu(bits)
-
-    bits = Bits('0011000000000000110011100100')
-    print CmcePdu(bits)
-
-    bits = Bits('010010000000000011000')
-    print CmcePdu(bits)
-
-    bits = Bits('0000100000000000110110000100')
-    print CmcePdu(bits)

@@ -33,9 +33,3 @@ class MmPdu(PduDiscriminator):
     pdu_types = {
         5: DLocationUpdateAccept
     }
-
-if __name__ == "__main__":
-    from pytetra.pdu.pdu import Bits
-
-    bits = Bits('01010111000001010100000111010001101110000010011000000101110000100000000000000000000001001000')
-    print MmPdu(bits)
