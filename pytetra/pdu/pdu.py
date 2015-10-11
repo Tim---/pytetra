@@ -3,6 +3,10 @@
 from collections import OrderedDict
 
 
+class PduDecodingException(Exception):
+    pass
+
+
 class Bits(object):
     def __init__(self, bits):
         self.bits = bits

@@ -1,5 +1,5 @@
 from collections import OrderedDict
-
+from pytetra.pdu.pdu import PduDecodingException
 
 # PDU encoding for sublayers 3.2 (CMCE, MM, SNDCP)
 
@@ -107,7 +107,8 @@ class Pdu(CompoundElement):
     @classmethod
     def parse(cls, bits):
         res = super(Pdu, cls).parse(bits)
-        assert len(bits) == 0
+        if len(bits):
+            raise PduDecodingException('Trailing bits at the end of PDU')
         return res
 
 
