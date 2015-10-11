@@ -37,7 +37,7 @@ class FastCrc(object):
 CrcChecker = FastCrc
 
 
-class TchsCrcChecker:
+class NormalTchsCrcChecker:
     def __init__(self):
         self.poly = map(int, '10001001')
 
@@ -52,6 +52,22 @@ class TchsCrcChecker:
             s = s[1:]
         b8 = sum(protected + s) % 2
         return unprotected + protected, list(reversed(s)) + [b8] == check
+
+
+class StealingTchsCrcChecker:
+    def __init__(self):
+        self.poly = map(int, '10011')
+
+    def __call__(self, b2):
+        unprotected, protected, check = b2[:107], b2[107:-4], b2[-4:]
+        s = list(reversed(protected))
+        s = s + [0] * (len(self.poly) - 1)
+        for i in range(len(s) - len(self.poly) + 1):
+            if s[0]:
+                for j in range(len(self.poly)):
+                    s[j] ^= self.poly[j]
+            s = s[1:]
+        return unprotected + protected, list(reversed(s)) == check
 
 
 if __name__ == "__main__":

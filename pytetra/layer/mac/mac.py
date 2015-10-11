@@ -33,6 +33,7 @@ class LowerMac(Layer, UpperTpSap):
                 self.decode("SCH/HD", bkn1)
                 self.decode("SCH/HD", bkn2)
         elif self.stack.upper_mac.mode == "traffic":
+            # For now, assume TCH/S for traffic mode
             if sf == 0:
                 self.decode("TCH/S normal", bkn1 + bkn2)
             else:
@@ -40,7 +41,7 @@ class LowerMac(Layer, UpperTpSap):
                 if self.bkn2_stolen:
                     self.decode("STCH", bkn2)
                 else:
-                    self.decode("TCH", bkn2)
+                    self.decode("TCH/S stealing", bkn2)
                 self.bkn2_stolen = False
 
     def set_mobile_codes(self, mcc, mnc):
@@ -58,9 +59,11 @@ class LowerMac(Layer, UpperTpSap):
         return map(int, '{0:010b}{1:014b}{2:06b}'.format(self.mcc, self.mnc, self.colour_code))
 
     def decode(self, channel, b5):
-        if channel != "TCH":
-            b1, crc_pass = self.decoder.decode(channel, b5)
+        b1, crc_pass = self.decoder.decode(channel, b5)
+        if channel in ['BSCH', 'SCH/F', 'SCH/HD', 'STCH', 'AACH']:
             self.stack.upper_mac.tmv_unitdata_indication(Bits(''.join(map(str, b1))), channel, crc_pass)
+        elif channel in ['TCH/S normal', 'TCH/S stealing']:
+            self.stack.upper_mac.tmd_unitdata_indication(Bits(''.join(map(str, b1))), channel, crc_pass)
 
 
 class UpperMac(Layer, UpperTmvSap):
@@ -103,3 +106,6 @@ class UpperMac(Layer, UpperTmvSap):
                             self.stack.llc.tmb_sysinfo_indication(pdu.sdu)
                         elif len(pdu.sdu):
                             self.stack.llc.tma_unitdata_indication(pdu.sdu)
+
+    def tmd_unitdata_indication(self, block, channel, crc_pass):
+        pass

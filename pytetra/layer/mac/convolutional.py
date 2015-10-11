@@ -146,13 +146,27 @@ class TchsConvolutionalDecoder(ConvolutionalDecoder):
 
     out_rate = 3
     num_states = 16
+
+
+class NormalTchsConvolutionalDecoder(TchsConvolutionalDecoder):
     puncturing = list(itertools.chain(
         itertools.islice(itertools.cycle((2, 1)), 0, 2 * 56),
         itertools.islice(itertools.cycle((3, 2, 2, 2)), 0, 2 * 30 + 8 + 4),
     ))
 
     def __call__(self, b3):
-        return b3[:2 * 51] + super(TchsConvolutionalDecoder, self).__call__(b3[2 * 51:])
+        return b3[:2 * 51] + super(NormalTchsConvolutionalDecoder, self).__call__(b3[2 * 51:])
+
+
+class StealingTchsConvolutionalDecoder(TchsConvolutionalDecoder):
+    puncturing = list(itertools.chain(
+        itertools.islice(itertools.cycle((2, 1)), 0, 56),
+        itertools.islice(itertools.cycle((3, 2, 2, 2, 2, 2, 2, 2)), 0, 30 + 4 + 4),
+    ))
+
+    def __call__(self, b3):
+        return b3[:51] + super(StealingTchsConvolutionalDecoder, self).__call__(b3[51:])
+
 
 if __name__ == "__main__":
     def bench_speed():
