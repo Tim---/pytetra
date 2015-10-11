@@ -8,7 +8,6 @@ from pytetra.layer import Layer
 
 class Mle(Layer, UpperTlaSap, UpperTlbSap):
     def tl_unitdata_indication(self, sdu):
-        self.info("lol %s" % (repr(sdu, )))
         pdu = MlePdu.parse(sdu)
         if pdu[ProtocolDiscriminator].value == 1:
             self.stack.mm.mle_unitdata_indication(pdu[SduElement].value)
