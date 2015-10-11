@@ -160,8 +160,8 @@ class BasicServiceInformation(CompoundElement):
         Type1(CircuitModeType),
         Type1(EncryptionFlag),
         Type1(CommunicationType),
-        Type1(SlotsPerFrame),
-        Type1(SpeechService),
+        Type1(SlotsPerFrame, cond=lambda elem: elem[CircuitModeType] != 0),
+        Type1(SpeechService, cond=lambda elem: elem[CircuitModeType] == 0),
     ]
     type2 = []
     type34 = []
