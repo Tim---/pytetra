@@ -22,13 +22,7 @@ class PduType(EnumElement):
         "D-TX INTERRUPT",
         "D-CALL-RESTORE",
         "D-SDS-DATA",
-        "D-FACILITY",
-        "D-TX GRANTED",
-        "D-TX GRANTED",
-        "D-TX GRANTED",
-        "D-TX GRANTED",
-        "D-TX GRANTED",
-        "D-TX GRANTED"] + [
+        "D-FACILITY"] + [
         "Reserved"] * 14 + [
         "CMCE FUNCTION NOT SUPPORTED"
     ]
