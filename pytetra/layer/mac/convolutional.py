@@ -59,7 +59,7 @@ class ConvolutionalDecoder(object):
         history = []
 
         # For each symbol
-        for j, n in enumerate(itertools.cycle((2, 1))):
+        for j, n in enumerate(itertools.cycle(self.puncturing)):
             # We get the significant bits of the symbol (bits not punctured)
             received, b3 = b3[:n], b3[n:]
 
@@ -127,6 +127,7 @@ class ConvolutionalDecoder2_3(ConvolutionalDecoder):
 
     out_rate = 4
     num_states = 16
+    puncturing = (2, 1)
 
 if __name__ == "__main__":
     def bench_speed():
