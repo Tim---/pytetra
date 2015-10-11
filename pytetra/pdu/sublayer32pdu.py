@@ -52,6 +52,7 @@ class CompoundElement(Element):
     type1 = None
     type2 = None
     type34 = None
+    sdu = False
 
     def __init__(self, *args):
         self.fields = OrderedDict()
@@ -75,6 +76,9 @@ class CompoundElement(Element):
                     for elem in compound_element.type34:
                         elem.decode(compound_element, bits)
                     m_bit = bits.read_int(1)
+
+        if compound_element.sdu:
+            compound_element.add_field(SduElement(bits))
 
         return compound_element
 
@@ -165,3 +169,9 @@ class Type4(TypeField):
                 length = bits.read_int(11)
                 repeat = bits.read_int(6)
                 parent.add_field([self.element.parse(bits) for r in range(repeat)])
+
+
+class SduElement(BitsElement):
+    @classmethod
+    def parse(cls, bits):
+        return cls(bits)

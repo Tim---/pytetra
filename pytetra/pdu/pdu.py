@@ -8,7 +8,7 @@ class Bits(object):
         self.bits = bits
 
     def __repr__(self):
-        return self.bits
+        return "%s('%s')" % (self.__class__.__name__, self.bits)
 
     def read(self, size):
         res, self.bits = Bits(self.bits[:size]), self.bits[size:]
@@ -26,6 +26,9 @@ class Bits(object):
 
     def __getitem__(self, key):
         return Bits(self.bits[key])
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.bits == other.bits
 
 
 class Field(object):
