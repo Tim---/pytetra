@@ -53,6 +53,7 @@ class CompoundElement(Element):
     type2 = None
     type34 = None
     sdu = False
+    has_o_bit = False
 
     def __init__(self, *args):
         self.fields = OrderedDict()
@@ -66,7 +67,7 @@ class CompoundElement(Element):
         for elem in compound_element.type1:
             elem.decode(compound_element, bits)
 
-        if compound_element.type2 or compound_element.type34:
+        if cls.has_o_bit or compound_element.type2 or compound_element.type34:
             o_bit = bits.read_int(1)
             if o_bit:
                 for elem in compound_element.type2:
@@ -101,7 +102,7 @@ class CompoundElement(Element):
 
 
 class Pdu(CompoundElement):
-    pass
+    has_o_bit = True
 
 
 class PduDiscriminator(Pdu):

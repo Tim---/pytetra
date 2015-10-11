@@ -17,6 +17,7 @@ class DMleSyncPdu(Pdu):
     ]
     type2 = []
     type34 = []
+    has_o_bit = False
 
 
 # 18.4.2.2 D-MLE-SYSINFO
@@ -30,6 +31,7 @@ class DMleSysinfoPdu(Pdu):
     ]
     type2 = []
     type34 = []
+    has_o_bit = False
 
 
 # 18.4.1.2 PDU type
@@ -41,3 +43,4 @@ class MlePdu(Pdu):
     type2 = []
     type34 = []
     sdu = True
+    has_o_bit = False
