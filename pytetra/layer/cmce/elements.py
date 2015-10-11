@@ -1,76 +1,159 @@
 from pytetra.pdu.sublayer32pdu import IntElement, EnumElement, CompoundElement, Type1, Type2, Type3
 
 
-class PduType(IntElement):
+# 14.8.28 PDU type
+class PduType(EnumElement):
     name = "PDU Type"
     length = 5
+    enum = [
+        "D-ALERT",
+        "D-CALL-PROCEEDING",
+        "D-CONNECT",
+        "D-CONNECT ACKNOWLEDGE",
+        "D-DISCONNECT",
+        "D-INFO",
+        "D-RELEASE",
+        "D-SETUP",
+        "D-STATUS",
+        "D-TX CEASED",
+        "D-TX CONTINUE",
+        "D-TX GRANTED",
+        "D-TX WAIT",
+        "D-TX INTERRUPT",
+        "D-CALL-RESTORE",
+        "D-SDS-DATA",
+        "D-FACILITY",
+        "D-TX GRANTED",
+        "D-TX GRANTED",
+        "D-TX GRANTED",
+        "D-TX GRANTED",
+        "D-TX GRANTED",
+        "D-TX GRANTED"] + [
+        "Reserved"] * 14 + [
+        "CMCE FUNCTION NOT SUPPORTED"
+    ]
 
 
+# 14.8.3 Call identifier
 class CallIdentifier(IntElement):
     name = "Call identifier"
     length = 14
 
 
+# 14.8.16 Call time-out
 class CallTimeout(IntElement):
     name = "Call timeout"
     length = 4
 
 
-class HookMethodSelection(IntElement):
+# 14.8.23 Hook method selection
+class HookMethodSelection(EnumElement):
     name = "Hook method selection"
     length = 1
+    enum = [
+        "disabled",
+        "enabled",
+    ]
 
 
-class SimplexDuplexSelection(IntElement):
+# 14.8.39 Simplex/duplex selection
+class SimplexDuplexSelection(EnumElement):
     name = "Simplex/duplex selection"
     length = 1
+    enum = [
+        "simplex",
+        "duplex",
+    ]
 
 
-class TxGrant(IntElement):
-    name = "Tx grant"
+# 14.8.42 Transmission grant
+class TransmissionGrant(EnumElement):
+    name = "Transmission grant"
     length = 2
+    enum = [
+        "granted",
+        "not granted",
+        "queued",
+        "granted to another user"
+    ]
 
 
-class TxReqPerm(IntElement):
-    name = "Tx req perm"
+# 14.8.43 Transmission request permission
+class TransmissionRequestPermission(EnumElement):
+    name = "Transmission request permission"
     length = 1
+    enum = ["allowed", "disallowed"]
 
 
+# 14.8.4 Call ownership
 class CallOwnership(IntElement):
     name = "Call ownership"
     length = 1
 
 
+# 14.8.12 Call priority
 class CallPriority(IntElement):
     name = "Call priority"
     length = 4
 
 
-class CircuitModeType(IntElement):
+# 14.8.17a Circuit mode type
+class CircuitModeType(EnumElement):
     name = "Circuit mode type"
     length = 3
+    enum = [
+        "TCH/S",
+        "TCH/7.2",
+        "TCH/4.8, N=1",
+        "TCH/4.8, N=4",
+        "TCH/4.8, N=8",
+        "TCH/2.4, N=1",
+        "TCH/2.4, N=4",
+        "TCH/2.4, N=8",
+    ]
 
 
-class EncryptionFlag(IntElement):
+# 14.8.21a Encryption flag
+class EncryptionFlag(EnumElement):
     name = "Encryption flag"
     length = 1
+    enum = [
+        "clear",
+        "encrypted",
+    ]
 
 
-class CommunicationType(IntElement):
+# 14.8.17c Communication type
+class CommunicationType(EnumElement):
     name = "Communication type"
     length = 2
+    enum = [
+        "point-to-point",
+        "point-to-multipoint",
+        "point-to-multipoint acknowledged",
+        "broadcast",
+    ]
 
 
+# 14.8.39a Slots per frame
 class SlotsPerFrame(IntElement):
     name = "Slots per frame"
     length = 2
 
 
-class SpeechService(IntElement):
+# 14.8.40 Speech service
+class SpeechService(EnumElement):
     name = "Speech service"
     length = 2
+    enum = [
+        "TETRA encoded speech",
+        "Reserved",
+        "Reserved",
+        "Proprietary encoded speech",
+    ]
 
 
+# 14.8.2 Basic service information
 class BasicServiceInformation(CompoundElement):
     name = "Basic service information"
     type1 = [
@@ -84,61 +167,79 @@ class BasicServiceInformation(CompoundElement):
     type34 = []
 
 
+# 14.8.41 Temporary address
 class TemporaryAddress(IntElement):
     name = "Temporary address"
     length = 24
 
 
+# 14.8.27 Notification indicator
 class NotificationIndicator(IntElement):
     name = "Notification indicator"
     length = 6
 
 
+# 14.8.22 Facility
 class Facility(IntElement):
     name = "Facility"
     length = None
 
 
+# 14.8.35 Proprietary
 class Proprietary(IntElement):
     name = "Proprietary"
     length = None
 
 
-class CallingPartyTypeIdentifier(IntElement):
+# 14.8.9 Calling party type identifier
+class CallingPartyTypeIdentifier(EnumElement):
     name = "Calling party type identifier"
     length = 2
+    enum = [
+        "Reserved",
+        "SSI",
+        "TSI",
+        "Reserved",
+    ]
 
 
-class CallingPartyAddressSsi(IntElement):
-    name = "Calling party address SSI"
+# 14.8.11 Calling party SSI
+class CallingPartySsi(IntElement):
+    name = "Calling party SSI"
     length = 24
 
 
+# 14.8.10 Calling party extension
 class CallingPartyExtension(IntElement):
     name = "Calling party extension"
     length = 24
 
 
+# 14.8.20 External subscriber number
 class ExternalSubscriberNumber(IntElement):
     name = "External subscriber number"
     length = None
 
 
+# 14.8.18a DM-MS address
 class DmMsAddress(IntElement):
     name = "DM-MS address"
     length = None
 
 
+# 14.8.18 Disconnect cause
 class DisconnectCause(IntElement):
     name = "Disconnect cause"
     length = 5
 
 
+# 14.8.17 Call time-out, set-up phase
 class CallTimeoutSetUpPhase(IntElement):
     name = "Call time-out, set-up phase"
     length = 3
 
 
+# 14.8.13 Call status
 class CallStatus(IntElement):
     name = "Call status"
     length = 3

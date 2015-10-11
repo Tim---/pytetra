@@ -8,13 +8,13 @@ class CmceTestCase(unittest.TestCase):
     def test_dconnect(self):
         bits = Bits('000100000000000011001110000000')
         pdu = DConnect(
-            PduType(2),
+            PduType('D-CONNECT'),
             CallIdentifier(6),
             CallTimeout(7),
-            HookMethodSelection(0),
-            SimplexDuplexSelection(0),
-            TxGrant(0),
-            TxReqPerm(0),
+            HookMethodSelection('disabled'),
+            SimplexDuplexSelection('simplex'),
+            TransmissionGrant('granted'),
+            TransmissionRequestPermission('allowed'),
             CallOwnership(0)
         )
         self.assertEqual(CmcePdu.parse(bits), pdu)
@@ -22,20 +22,20 @@ class CmceTestCase(unittest.TestCase):
     def test_dsetup(self):
         bits = Bits('00111000000000001100111000000010011000001001010000000000000000011001010')
         pdu = DSetup(
-            PduType(7),
+            PduType('D-SETUP'),
             CallIdentifier(6),
             CallTimeout(7),
-            HookMethodSelection(0),
-            SimplexDuplexSelection(0),
+            HookMethodSelection('disabled'),
+            SimplexDuplexSelection('simplex'),
             BasicServiceInformation(
-                CircuitModeType(0),
-                EncryptionFlag(0),
-                CommunicationType(1),
+                CircuitModeType('TCH/S'),
+                EncryptionFlag('clear'),
+                CommunicationType('point-to-multipoint'),
                 SlotsPerFrame(0),
-                SpeechService(3)
+                SpeechService('Proprietary encoded speech')
             ),
-            TxGrant(0),
-            TxReqPerm(0),
+            TransmissionGrant('granted'),
+            TransmissionRequestPermission('allowed'),
             CallPriority(2)
         )
         self.assertEqual(CmcePdu.parse(bits), pdu)
@@ -43,7 +43,7 @@ class CmceTestCase(unittest.TestCase):
     def test_drelease(self):
         bits = Bits('0011000000000000110011100100')
         pdu = DRelease(
-            PduType(6),
+            PduType('D-RELEASE'),
             CallIdentifier(6),
             DisconnectCause(14)
         )
@@ -52,19 +52,19 @@ class CmceTestCase(unittest.TestCase):
     def test_dtxceased(self):
         bits = Bits('010010000000000011000')
         pdu = DTxCeased(
-            PduType(9),
+            PduType('D-TX CEASED'),
             CallIdentifier(6),
-            TxReqPerm(0)
+            TransmissionRequestPermission('allowed')
         )
         self.assertEqual(CmcePdu.parse(bits), pdu)
 
     def test_dcallproceeding(self):
         bits = Bits('0000100000000000110110000100')
         pdu = DCallProceeding(
-            PduType(1),
+            PduType('D-CALL-PROCEEDING'),
             CallIdentifier(6),
             CallTimeoutSetUpPhase(6),
-            HookMethodSelection(0)
+            HookMethodSelection('disabled')
         )
         self.assertEqual(CmcePdu.parse(bits), pdu)
 
