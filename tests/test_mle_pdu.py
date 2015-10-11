@@ -7,33 +7,72 @@ from pytetra.layer.mle.elements import *
 
 class MleTestCase(unittest.TestCase):
     def test_mlepdu(self):
-        bits = Bits('00101010111000001010100000111010001101110000010011000000101110000100000000000000000000001001000')
+        bits = '00101010111000001010100000111010001101110000010011000000101110000100000000000000000000001001000'
+        #       ***                                                                                              Protocol discriminator = 1 (MM protocol)
+        #          ********************************************************************************************  SDU
+
         pdu = MlePdu(
-            ProtocolDiscriminator(1),
+            ProtocolDiscriminator('MM'),
             SduElement(Bits('01010111000001010100000111010001101110000010011000000101110000100000000000000000000001001000'))
         )
-        self.assertEqual(MlePdu.parse(bits), pdu)
+        self.assertEqual(MlePdu.parse(Bits(bits)), pdu)
 
     def test_dmlesync(self):
-        bits = Bits('00000000010000000000000110001')
+        bits = '00000000010000000000000110001'
+        #       **********                     MCC = 1
+        #                 **************       MNC = 1
+        #                               ==     Neighbour cell broadcast
+        #                               *      D-NWRK-BROADCAST broadcast supported = 1 (Supported)
+        #                                *     D-NWRK-BROADCAST enquiry supported = 0 (Not supported)
+        #                                 **   Cell service level = 0 (Cell load unknown)
+        #                                   *  Late entry information = 1 (Late entry available)
+
         pdu = DMleSyncPdu(
             Mcc(1),
             Mnc(1),
             NeighbourCellBroadcast(2),
-            CellServiceLevel(0),
-            LateEntryInformation(1)
+            CellServiceLevel('unknown'),
+            LateEntrySupported('available')
         )
-        self.assertEqual(DMleSyncPdu.parse(bits), pdu)
+        self.assertEqual(DMleSyncPdu.parse(Bits(bits)), pdu)
 
     def test_dmlesysinfo(self):
-        bits = Bits('000000000000011111111111111111110100100101')
+        bits = '000000000000011111111111111111110100100101'
+        #       **************                             LA = 1
+        #                     ****************             Subscriber class = Member of all classes
+        #                                     ============ BS service details
+        #                                     *            Registration = 1 (Registration mandatory on this cell)
+        #                                      *           De-registration = 1 (De-registration mandatory on this cell)
+        #                                       *          Priority cell = 0 (Cell is not a priority cell)
+        #                                        *         Minimum mode service = 1 (Cell never uses minimum mode)
+        #                                         *        Migration = 0 (Migration is not supported by this cell)
+        #                                          *       System wide services = 0 (System wide services temporarily not supported)
+        #                                           *      TETRA voice service = 1 (TETRA voice service is supported on this cell)
+        #                                            *     Circuit mode data service = 0 (Circuit mode data service is not supported on this cell)
+        #                                             *    Reserved = 0 (Service is not available on this cel)
+        #                                              *   SNDCPService = 1 (SNDCP service is available on this cell)
+        #                                               *  Air interface encryption service = 0 (Air interface encryption is not available on this cell)
+        #                                                * Advanced link supported = 1 (Advanced link is supported on this cell)
+
         pdu = DMleSysinfoPdu(
             La(1),
             SubscriberClass(65535),
-            NeighbourCellBroadcast(3),
-            BsServiceDetails(293)
+            BsServiceDetails(
+                BsServiceRegistration(1),
+                BsServiceDeregistration(1),
+                BsServicePriorityCell(0),
+                BsServiceMinimumMode(1),
+                BsServiceMigration(0),
+                BsServiceSystemWide(0),
+                BsServiceTetraVoice(1),
+                BsServiceCircuitModeData(0),
+                BsServiceReserved(0),
+                BsServiceSndcp(1),
+                BsServiceEncryption(0),
+                BsServiceAdvancedLink(1)
+            )
         )
-        self.assertEqual(DMleSysinfoPdu.parse(bits), pdu)
+        self.assertEqual(DMleSysinfoPdu.parse(Bits(bits)), pdu)
 
 
 if __name__ == '__main__':

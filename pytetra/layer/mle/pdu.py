@@ -13,7 +13,7 @@ class DMleSyncPdu(Pdu):
         Type1(Mnc),
         Type1(NeighbourCellBroadcast),
         Type1(CellServiceLevel),
-        Type1(LateEntryInformation),
+        Type1(LateEntrySupported),
     ]
     type2 = []
     type34 = []
@@ -26,7 +26,6 @@ class DMleSysinfoPdu(Pdu):
     type1 = [
         Type1(La),
         Type1(SubscriberClass),
-        Type1(NeighbourCellBroadcast),
         Type1(BsServiceDetails),
     ]
     type2 = []

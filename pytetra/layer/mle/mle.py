@@ -9,9 +9,9 @@ from pytetra.layer import Layer
 class Mle(Layer, UpperTlaSap, UpperTlbSap):
     def tl_unitdata_indication(self, sdu):
         pdu = MlePdu.parse(sdu)
-        if pdu[ProtocolDiscriminator].value == 1:
+        if pdu[ProtocolDiscriminator].value == 'MM':
             self.stack.mm.mle_unitdata_indication(pdu[SduElement].value)
-        elif pdu[ProtocolDiscriminator].value == 2:
+        elif pdu[ProtocolDiscriminator].value == 'CMCE':
             self.stack.cmce.mle_unitdata_indication(pdu[SduElement].value)
 
     def tl_sync_indication(self, sdu):
