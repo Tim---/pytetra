@@ -34,7 +34,7 @@ class LowerMac(Layer, UpperTpSap):
                 self.decode("SCH/HD", bkn2)
         elif self.stack.upper_mac.mode == "traffic":
             if sf == 0:
-                self.decode("TCH", bkn1 + bkn2)
+                self.decode("TCH/S normal", bkn1 + bkn2)
             else:
                 self.decode("STCH", bkn1)
                 if self.bkn2_stolen:

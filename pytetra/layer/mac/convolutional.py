@@ -59,7 +59,7 @@ class ConvolutionalDecoder(object):
         history = []
 
         # For each symbol
-        for j, n in enumerate(itertools.cycle(self.puncturing)):
+        for j, n in enumerate(self.puncturing):
             # We get the significant bits of the symbol (bits not punctured)
             received, b3 = b3[:n], b3[n:]
 
@@ -127,7 +127,32 @@ class ConvolutionalDecoder2_3(ConvolutionalDecoder):
 
     out_rate = 4
     num_states = 16
-    puncturing = (2, 1)
+    puncturing = itertools.cycle((2, 1))
+
+
+class TchsConvolutionalDecoder(ConvolutionalDecoder):
+    next_output = [
+        (0, 7), (6, 1), (5, 2), (3, 4),
+        (6, 1), (0, 7), (3, 4), (5, 2),
+        (7, 0), (1, 6), (2, 5), (4, 3),
+        (1, 6), (7, 0), (4, 3), (2, 5)
+    ]
+    next_state = [
+        (0, 1), (2, 3), (4, 5), (6, 7),
+        (8, 9), (10, 11), (12, 13), (14, 15),
+        (0, 1), (2, 3), (4, 5), (6, 7),
+        (8, 9), (10, 11), (12, 13), (14, 15),
+    ]
+
+    out_rate = 3
+    num_states = 16
+    puncturing = list(itertools.chain(
+        itertools.islice(itertools.cycle((2, 1)), 0, 2 * 56),
+        itertools.islice(itertools.cycle((3, 2, 2, 2)), 0, 2 * 30 + 8 + 4),
+    ))
+
+    def __call__(self, b3):
+        return b3[:2 * 51] + super(TchsConvolutionalDecoder, self).__call__(b3[2 * 51:])
 
 if __name__ == "__main__":
     def bench_speed():

@@ -22,3 +22,21 @@ class SCHFDeinterleaver(BlockDeinterleaver):
 class HalfDeinterleaver(BlockDeinterleaver):
     def __init__(self):
         super(HalfDeinterleaver, self).__init__(216, 101)
+
+
+class MatrixDeinterleaver(object):
+    def __init__(self, nlines, ncolumns):
+        self.nlines = nlines
+        self.ncolumns = ncolumns
+
+    def __call__(self, b4):
+        res = [0] * len(b4)
+        for i in range(self.ncolumns):
+            for j in range(self.nlines):
+                res[j * self.ncolumns + i] = b4[i * self.nlines + j]
+        return res
+
+
+class TCHSDeinterleaver(MatrixDeinterleaver):
+    def __init__(self):
+        MatrixDeinterleaver.__init__(self, 24, 18)

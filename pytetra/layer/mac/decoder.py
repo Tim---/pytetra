@@ -1,7 +1,7 @@
 from pytetra.layer.mac.scrambling import Unscrambler
-from pytetra.layer.mac.interleaving import BSCHDeinterleaver, SCHFDeinterleaver, HalfDeinterleaver
-from pytetra.layer.mac.convolutional import ConvolutionalDecoder2_3
-from pytetra.layer.mac.crc import CrcChecker
+from pytetra.layer.mac.interleaving import BSCHDeinterleaver, SCHFDeinterleaver, HalfDeinterleaver, TCHSDeinterleaver
+from pytetra.layer.mac.convolutional import ConvolutionalDecoder2_3, TchsConvolutionalDecoder
+from pytetra.layer.mac.crc import CrcChecker, TchsCrcChecker
 from pytetra.layer.mac.rmcode import RMDecoder
 
 
@@ -46,6 +46,14 @@ class AACHDecoder(Decoder):
         self.block_decode = RMDecoder()
 
 
+class NormalTchsDecoder(Decoder):
+    def __init__(self, extended_colour_code):
+        self.unscramble = Unscrambler(extended_colour_code)
+        self.deinterleave = TCHSDeinterleaver()
+        self.convolutional_decode = TchsConvolutionalDecoder()
+        self.block_decode = TchsCrcChecker()
+
+
 BNCHDecoder = STCHDecoder = SCHHDDecoder
 
 
@@ -61,3 +69,4 @@ class Decoders(dict):
         self['SCH/HD'] = SCHHDDecoder(extended_colour_code)
         self['STCH'] = STCHDecoder(extended_colour_code)
         self['AACH'] = AACHDecoder(extended_colour_code)
+        self['TCH/S normal'] = NormalTchsDecoder(extended_colour_code)
