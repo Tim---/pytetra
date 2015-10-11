@@ -25,7 +25,7 @@ class CmceTestCase(unittest.TestCase):
             SimplexDuplexSelection('simplex'),
             TransmissionGrant('granted'),
             TransmissionRequestPermission('allowed'),
-            CallOwnership(0)
+            CallOwnership(0),
         )
         self.assertEqual(CmcePdu.parse(Bits(bits)), pdu)
 
@@ -68,7 +68,7 @@ class CmceTestCase(unittest.TestCase):
             TransmissionRequestPermission('allowed'),
             CallPriority(0),
             CallingPartyTypeIdentifier('SSI'),
-            CallingPartySsi(101)
+            CallingPartySsi(101),
         )
         self.assertEqual(CmcePdu.parse(Bits(bits)), pdu)
 
@@ -82,7 +82,7 @@ class CmceTestCase(unittest.TestCase):
         pdu = DRelease(
             PduType('D-RELEASE'),
             CallIdentifier(6),
-            DisconnectCause(14)
+            DisconnectCause(14),
         )
         self.assertEqual(CmcePdu.parse(Bits(bits)), pdu)
 
@@ -96,7 +96,7 @@ class CmceTestCase(unittest.TestCase):
         pdu = DTxCeased(
             PduType('D-TX CEASED'),
             CallIdentifier(6),
-            TransmissionRequestPermission('allowed')
+            TransmissionRequestPermission('allowed'),
         )
         self.assertEqual(CmcePdu.parse(Bits(bits)), pdu)
 
@@ -113,7 +113,8 @@ class CmceTestCase(unittest.TestCase):
             PduType('D-CALL-PROCEEDING'),
             CallIdentifier(6),
             CallTimeoutSetUpPhase(6),
-            HookMethodSelection('disabled')
+            HookMethodSelection('disabled'),
+            SimplexDuplexSelection('simplex'),
         )
         self.assertEqual(CmcePdu.parse(Bits(bits)), pdu)
 

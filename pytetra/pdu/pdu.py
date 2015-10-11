@@ -28,7 +28,12 @@ class Bits(object):
         return Bits(self.bits[key])
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.bits == other.bits
+        if isinstance(other, self.__class__):
+            return self.bits == other.bits
+        elif isinstance(other, str):
+            return self.bits == other
+        else:
+            return False
 
 
 class Field(object):

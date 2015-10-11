@@ -105,6 +105,7 @@ class DCallProceeding(Pdu):
         Type1(CallIdentifier),
         Type1(CallTimeoutSetUpPhase),
         Type1(HookMethodSelection),
+        Type1(SimplexDuplexSelection),
     ]
     type2 = [
         Type2(BasicServiceInformation),

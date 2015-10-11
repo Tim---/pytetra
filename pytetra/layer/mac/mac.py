@@ -101,5 +101,5 @@ class UpperMac(Layer, UpperTmvSap):
                     else:
                         if isinstance(pdu, SysinfoPdu):
                             self.stack.llc.tmb_sysinfo_indication(pdu.sdu)
-                        else:
+                        elif len(pdu.sdu):
                             self.stack.llc.tma_unitdata_indication(pdu.sdu)

@@ -74,11 +74,12 @@ class MacResourcePdu(Pdu):
         if self.length_indication < 4 or self.length_indication > 34:
             print "MAC PDU length problem"
         sduSize = self.length_indication * 8 - (initialSize - len(bits))
-        self.fields['sdu'] = BitsField('sdu', sduSize).dissect(self, bits)
+        sdu = BitsField('sdu', sduSize).dissect(self, bits)
         if self.fill_bits_indication:
-            while self.sdu[-1] == '0':
-                self.sdu = self.sdu[:-1]
-            self.sdu = self.sdu[:-1]
+            while sdu[-1] == '0':
+                sdu = sdu[:-1]
+            sdu = sdu[:-1]
+        self.fields['sdu'] = sdu
 
 
 # 21.4.4 TMB-SAP: MAC PDU structure for broadcast

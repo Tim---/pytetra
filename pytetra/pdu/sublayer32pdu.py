@@ -79,7 +79,7 @@ class CompoundElement(Element):
                     m_bit = bits.read_int(1)
 
         if compound_element.sdu:
-            compound_element.add_field(SduElement(bits))
+            compound_element.add_field(SduElement(bits.read(len(bits))))
 
         return compound_element
 
@@ -103,6 +103,12 @@ class CompoundElement(Element):
 
 class Pdu(CompoundElement):
     has_o_bit = True
+
+    @classmethod
+    def parse(cls, bits):
+        res = super(Pdu, cls).parse(bits)
+        assert len(bits) == 0
+        return res
 
 
 class PduDiscriminator(Pdu):

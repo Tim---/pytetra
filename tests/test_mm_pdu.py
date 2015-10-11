@@ -6,7 +6,7 @@ from pytetra.layer.mm.elements import *
 
 class MmTestCase(unittest.TestCase):
     def test_dlocationupdateaccept(self):
-        bits = Bits('01010111000001010100000111010001101110000010011000000101110000100000000000000000000001001000')
+        bits = '0101011100000101010000011101000110111000001001100000010111000010000000000000000000000100'
         pdu = DLocationUpdateAccept(
             PduType(5),
             LocationUpdateAcceptType('ITSI attach'),
@@ -26,7 +26,7 @@ class MmTestCase(unittest.TestCase):
                 ]
             )
         )
-        assert MmPdu.parse(bits) == pdu
+        assert MmPdu.parse(Bits(bits)) == pdu
 
 if __name__ == '__main__':
     unittest.main()
