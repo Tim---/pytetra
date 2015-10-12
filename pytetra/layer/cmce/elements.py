@@ -28,6 +28,11 @@ class PduType(EnumElement):
     ]
 
 
+class Reserved(IntElement):
+    name = "Encryption control"
+    length = 1
+
+
 # 14.8.3 Call identifier
 class CallIdentifier(IntElement):
     name = "Call identifier"
@@ -104,6 +109,16 @@ class CircuitModeType(EnumElement):
         "TCH/2.4, N=1",
         "TCH/2.4, N=4",
         "TCH/2.4, N=8",
+    ]
+
+
+# 14.8.21 Encryption control
+class EncryptionControl(EnumElement):
+    name = "Encryption control"
+    length = 1
+    enum = [
+        "clear",
+        "encrypted",
     ]
 
 
@@ -206,6 +221,30 @@ class CallingPartySsi(IntElement):
 # 14.8.10 Calling party extension
 class CallingPartyExtension(IntElement):
     name = "Calling party extension"
+    length = 24
+
+
+# 14.8.44 Transmitting party type identifier
+class TransmittingPartyTypeIdentifier(EnumElement):
+    name = "Transmitting party type identifier"
+    length = 2
+    enum = [
+        "Reserved",
+        "SSI",
+        "TSI",
+        "Reserved",
+    ]
+
+
+# 14.8.46 Transmitting party SSI
+class TransmittingPartySsi(IntElement):
+    name = "Transmitting party SSI"
+    length = 24
+
+
+# 14.8.45 Transmitting party extension
+class TransmittingPartyExtension(IntElement):
+    name = "Transmitting party extension"
     length = 24
 
 

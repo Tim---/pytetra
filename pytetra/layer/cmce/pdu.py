@@ -96,6 +96,32 @@ class DTxCeased(Pdu):
     ]
 
 
+# 14.7.1.15 D-TX GRANTED
+class DTxGranted(Pdu):
+    name = "D-TX GRANTED"
+
+    type1 = [
+        Type1(PduType),
+        Type1(CallIdentifier),
+        Type1(TransmissionGrant),
+        Type1(TransmissionRequestPermission),
+        Type1(EncryptionControl),
+        Type1(Reserved),
+    ]
+    type2 = [
+        Type2(NotificationIndicator),
+        Type2(TransmittingPartyTypeIdentifier),
+        Type2(TransmittingPartySsi, cond=lambda pkt: pkt[TransmittingPartyTypeIdentifier].value in ["SSI", "TSI"]),
+        Type2(TransmittingPartyExtension, cond=lambda pkt: pkt[TransmittingPartyTypeIdentifier].value == "TSI"),
+    ]
+    type34 = [
+        Type3(ExternalSubscriberNumber),
+        Type3(Facility),
+        Type3(DmMsAddress),
+        Type3(Proprietary),
+    ]
+
+
 # 14.7.1.2 D-CALL PROCEEDING
 class DCallProceeding(Pdu):
     name = "D-CALL PROCEEDING"
@@ -127,4 +153,5 @@ class CmcePdu(PduDiscriminator):
         6: DRelease,
         7: DSetup,
         9: DTxCeased,
+        11: DTxGranted,
     }
