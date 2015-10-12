@@ -63,7 +63,10 @@ class LowerMac(Layer, UpperTpSap):
         b1, crc_pass = self.decoder.decode(channel, b5)
         if channel in ['BSCH', 'SCH/F', 'SCH/HD', 'STCH', 'AACH']:
             self.stack.upper_mac.tmv_unitdata_indication(Bits(''.join(map(str, b1))), channel, crc_pass)
-        elif channel in ['TCH/S normal', 'TCH/S stealing']:
+        elif channel == 'TCH/S normal':
+            for frame in b1:
+                self.stack.upper_mac.tmd_unitdata_indication(Bits(''.join(map(str, frame))), channel, crc_pass)
+        elif channel == 'TCH/S stealing':
             self.stack.upper_mac.tmd_unitdata_indication(Bits(''.join(map(str, b1))), channel, crc_pass)
 
 

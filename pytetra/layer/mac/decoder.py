@@ -3,6 +3,7 @@ from pytetra.layer.mac.interleaving import BSCHDeinterleaver, SCHFDeinterleaver,
 from pytetra.layer.mac.convolutional import ConvolutionalDecoder2_3, NormalTchsConvolutionalDecoder, StealingTchsConvolutionalDecoder
 from pytetra.layer.mac.crc import CrcChecker, NormalTchsCrcChecker, StealingTchsCrcChecker
 from pytetra.layer.mac.rmcode import RMDecoder
+from pytetra.layer.mac.reordering import TchsReorderer
 
 
 class Decoder(object):
@@ -52,6 +53,12 @@ class NormalTchsDecoder(Decoder):
         self.deinterleave = TCHSDeinterleaver()
         self.convolutional_decode = NormalTchsConvolutionalDecoder()
         self.block_decode = NormalTchsCrcChecker()
+        self.reorder = TchsReorderer()
+
+    def decode(self, b5):
+        b1, crc_pass = super(NormalTchsDecoder, self).decode(b5)
+        b0 = self.reorder(b1[::2]), self.reorder(b1[1::2])
+        return b0, crc_pass
 
 
 class StealingTchsDecoder(Decoder):
@@ -60,6 +67,13 @@ class StealingTchsDecoder(Decoder):
         self.deinterleave = HalfDeinterleaver()
         self.convolutional_decode = StealingTchsConvolutionalDecoder()
         self.block_decode = StealingTchsCrcChecker()
+        self.reorder = TchsReorderer()
+
+    def decode(self, b5):
+        b1, crc_pass = super(StealingTchsDecoder, self).decode(b5)
+        b0 = self.reorder(b1)
+        return b0, crc_pass
+
 
 BNCHDecoder = STCHDecoder = SCHHDDecoder
 
