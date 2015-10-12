@@ -20,6 +20,8 @@ class LlcPdu(Pdu):
             return BlUDataPdu(bits)
         elif pdu.pdu_type == 3:
             return BlAckPdu(bits)
+        elif pdu.pdu_type == 10:
+            return AlUDataPdu(bits)
 
 
 # 21.2.2.1 BL-ACK
@@ -49,5 +51,15 @@ class BlDataPdu(Pdu):
 # 21.2.2.4 BL-UDATA
 class BlUDataPdu(Pdu):
     fields_desc = [
+        BitsField("sdu"),
+    ]
+
+
+# 21.2.2.4 AL-UDATA
+class AlUDataPdu(Pdu):
+    fields_desc = [
+        UIntField("final", 1),
+        UIntField("n_s", 8),
+        UIntField("s_s", 8),
         BitsField("sdu"),
     ]
