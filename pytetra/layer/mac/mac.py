@@ -26,13 +26,14 @@ class LowerMac(Layer, UpperTpSap):
 
     def tp_ndb_indication(self, bb, bkn1, bkn2, sf):
         self.decode("AACH", bb)
-        if self.stack.upper_mac.mode == "signalling":
+        if self.stack.upper_mac.downlink_usage_marker in [UpperMac.UMa, UpperMac.UMc]:
+            # Common control
             if sf == 0:
                 self.decode("SCH/F", bkn1 + bkn2)
             else:
                 self.decode("SCH/HD", bkn1)
                 self.decode("SCH/HD", bkn2)
-        elif self.stack.upper_mac.mode == "traffic":
+        elif self.stack.upper_mac.downlink_usage_marker in UpperMac.Umt:
             # For now, assume TCH/S for traffic mode
             if sf == 0:
                 self.decode("TCH/S normal", bkn1 + bkn2)
@@ -67,28 +68,37 @@ class LowerMac(Layer, UpperTpSap):
 
 
 class UpperMac(Layer, UpperTmvSap):
+    # 21.4.7 MAC PDU structure for access assignment broadcast
+    UMx, UMa, UMc, UMr = xrange(4)
+    Umt = xrange(4, 2 ** 6)
+
     def __init__(self, stack):
         super(UpperMac, self).__init__(stack)
 
-        self.mode = "signalling"
+        self.downlink_usage_marker = None
 
     def tmv_unitdata_indication(self, block, channel, crc_pass):
-        if crc_pass:
+        if channel == "AACH":
+            if crc_pass:
+                pdu = AccessAssignPdu(block)
+                self.info("%s" % (repr(pdu, )))
+
+                if g_timebase.fn == 18:
+                    self.downlink_usage_marker = self.UMc
+                else:
+                    if pdu.header == 0:
+                        self.downlink_usage_marker = self.UMc
+                    else:
+                        self.downlink_usage_marker = pdu.field1
+            else:
+                self.downlink_usage_marker = self.UMx
+        elif crc_pass:
             if channel == "BSCH":
                 pdu = SyncPdu(block)
                 self.info("%s" % (repr(pdu, )))
                 g_timebase.update(pdu.timeslot_number + 1, pdu.frame_number, pdu.multiframe_number)
                 self.stack.lower_mac.set_colour_code(pdu.colour_code)
                 self.stack.llc.tmb_sync_indication(pdu.tm_sdu)
-            elif channel == "AACH":
-                pdu = AccessAssignPdu(block)
-                self.info("%s" % (repr(pdu, )))
-
-                # Traffic mode ?
-                if g_timebase.fn != 18 and pdu.header != 0 and pdu.field1 > 3:
-                    self.mode = "traffic"
-                else:
-                    self.mode = "signalling"
             elif channel in ["SCH/F", "SCH/HD", "STCH"]:
                 while True:
                     if len(block) < 23:
