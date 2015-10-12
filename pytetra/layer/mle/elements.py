@@ -17,6 +17,40 @@ class ProtocolDiscriminator(EnumElement):
     ]
 
 
+# 18.5.20 PDU type
+class PduType(EnumElement):
+    name = "PDU type"
+    length = 3
+    enum = [
+        "D-NEW CELL",
+        "D-PREPARE FAIL",
+        "D-NWRK-BROADCAST",
+        "Reserved",
+        "D-RESTORE-ACK",
+        "D-RESTORE-FAIL",
+        "Reserved",
+        "Reserved",
+    ]
+
+
+# 18.5.4 Cell re-select parameters
+class CellReselectParameters(IntElement):
+    name = "Cell re-select parameters"
+    length = 16
+
+
+# 18.5.24 TETRA network time
+class TetraNetworkTime(IntElement):
+    name = "TETRA network time"
+    length = 48
+
+
+# 18.5.19 Number of neighbour cells
+class NumberOfNeighbourCells(IntElement):
+    name = "Number of neighbour cells"
+    length = 3
+
+
 # 18.5.14 MCC
 class Mcc(IntElement):
     name = "MCC"
@@ -147,4 +181,83 @@ class BsServiceDetails(CompoundElement):
         Type1(BsServiceAdvancedLink),
     ]
     type2 = []
+    type34 = []
+
+
+# 18.5.3 Cell identifier
+class CellIdentifier(IntElement):
+    name = "Cell identifier"
+    length = 5
+
+
+# 18.5.1 Cell re-selection types supported
+class CellReselectionTypesSupported(IntElement):
+    name = "Cell re-selection types supported"
+    length = 2
+
+
+# 18.5.18 Neighbour cell synchronized
+class NeighbourCellSynchronized(IntElement):
+    name = "Neighbour cell synchronized"
+    length = 1
+
+
+# 18.5.10 Main carrier number
+class MainCarrierNumber(IntElement):
+    name = "Main carrier number"
+    length = 12
+
+
+# 18.5.11 Main carrier number extension
+class MainCarrierNumberExtension(IntElement):
+    name = "Main carrier number extension"
+    length = 10
+
+
+# 18.5.13 Maximum MS transmit power
+class MaximumMsTransmitPower(IntElement):
+    name = "Maximum MS transmit power"
+    length = 3
+
+
+# 18.5.12 Minimum Rx access level
+class MinimumRxAccessLevel(IntElement):
+    name = "Minimum Rx access level"
+    length = 4
+
+
+# 18.5.25 Timeshare cell and AI encryption information
+class TimeshareCellAndAiEncryptionInformation(IntElement):
+    name = "Timeshare cell and AI encryption information"
+    length = 5
+
+
+# 18.5.23 TDMA frame offset
+class TdmaFrameOffset(IntElement):
+    name = "TDMA frame offset"
+    length = 6
+
+
+# 18.5.17 Neighbour cell information
+class NeighbourCellInformation(CompoundElement):
+    name = "Neighbour cell information"
+    type1 = [
+        Type1(CellIdentifier),
+        Type1(CellReselectionTypesSupported),
+        Type1(NeighbourCellSynchronized),
+        Type1(CellServiceLevel),
+        Type1(MainCarrierNumber),
+    ]
+    type2 = [
+        Type2(MainCarrierNumberExtension),
+        Type2(Mcc),
+        Type2(Mnc),
+        Type2(La),
+        Type2(MaximumMsTransmitPower),
+        Type2(MinimumRxAccessLevel),
+        Type2(SubscriberClass),
+        Type2(BsServiceDetails),
+        Type2(TimeshareCellAndAiEncryptionInformation),
+        Type2(TdmaFrameOffset),
+    ]
     type34 = []

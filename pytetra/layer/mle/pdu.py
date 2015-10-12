@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # from pytetra.pdu import Pdu, UIntField, BitsField
-from pytetra.pdu.sublayer32pdu import Pdu, Type1, Type2, Type3, PduDiscriminator
+from pytetra.pdu.sublayer32pdu import Pdu, Type1, Type2, Type3, PduDiscriminator, Repeat
 from pytetra.layer.mle.elements import *
 
 
@@ -33,8 +33,8 @@ class DMleSysinfoPdu(Pdu):
     has_o_bit = False
 
 
-# 18.4.1.2 PDU type
-class MlePdu(Pdu):
+# 18.4.1.3 MLE service user PDUs
+class MleServicePdu(Pdu):
     name = "MLE PDU"
     type1 = [
         Type1(ProtocolDiscriminator),
@@ -43,3 +43,27 @@ class MlePdu(Pdu):
     type34 = []
     sdu = True
     has_o_bit = False
+
+
+# 18.4.1.4.1 D-NWRK-BROADCAST
+class DNwrkBroadcast(Pdu):
+    name = "D-NWRK-BROADCAST"
+    type1 = [
+        Type1(PduType),
+        Type1(CellReselectParameters),
+        Type1(CellServiceLevel),
+    ]
+    type2 = [
+        Type2(TetraNetworkTime),
+        Type2(NumberOfNeighbourCells),
+        Repeat(NeighbourCellInformation, lambda pkt: pkt[NumberOfNeighbourCells].value),
+    ]
+    type34 = []
+
+
+# 18.4.1.2 PDU type
+class MlePdu(PduDiscriminator):
+    element = PduType
+    pdu_types = {
+        2: DNwrkBroadcast,
+    }

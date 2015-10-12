@@ -1,7 +1,7 @@
 import unittest
 from pytetra.pdu.pdu import Bits
 from pytetra.pdu.sublayer32pdu import SduElement
-from pytetra.layer.mle.pdu import MlePdu, DMleSyncPdu, DMleSysinfoPdu
+from pytetra.layer.mle.pdu import MleServicePdu, DMleSyncPdu, DMleSysinfoPdu
 from pytetra.layer.mle.elements import *
 
 
@@ -11,11 +11,11 @@ class MleTestCase(unittest.TestCase):
         #       ***                                                                                              Protocol discriminator = 1 (MM protocol)
         #          ********************************************************************************************  SDU
 
-        pdu = MlePdu(
+        pdu = MleServicePdu(
             ProtocolDiscriminator('MM'),
             SduElement(Bits('01010111000001010100000111010001101110000010011000000101110000100000000000000000000001001000'))
         )
-        self.assertEqual(MlePdu.parse(Bits(bits)), pdu)
+        self.assertEqual(MleServicePdu.parse(Bits(bits)), pdu)
 
     def test_dmlesync(self):
         bits = '00000000010000000000000110001'

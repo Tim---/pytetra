@@ -123,7 +123,8 @@ class PduDiscriminator(Pdu):
 
 
 class TypeField(object):
-    pass
+    def __repr__(self):
+        return '%s(%s)' % (self.__class__.__name__, self.element.__name__)
 
 
 class Type1(TypeField):
@@ -177,6 +178,15 @@ class Type4(TypeField):
                 length = bits.read_int(11)
                 repeat = bits.read_int(6)
                 parent.add_field([self.element.parse(bits) for r in range(repeat)])
+
+
+class Repeat(TypeField):
+    def __init__(self, element, num):
+        self.element = element
+        self.num = num
+
+    def decode(self, parent, bits):
+        parent.add_field([self.element.parse(bits) for r in range(self.num(parent))])
 
 
 class SduElement(BitsElement):
