@@ -20,10 +20,28 @@ class DLocationUpdateAccept(Pdu):
     ]
     type34 = [
         Type4(NewRegisteredArea),
-        Type3(GroupIdendtityLocationAccept),
+        Type3(GroupIdentityLocationAccept),
         Type3(DefaultGroupAttachementLifetime),
         Type3(AuthenticationDownlink),
         Type3(Proprietary),
+    ]
+
+
+# 16.9.2.1 D-ATTACH/DETACH GROUP IDENTITY
+class DAttachDetachGroupIdentity(Pdu):
+    name = "D-ATTACH/DETACH GROUP IDENTITY"
+
+    type1 = [
+        Type1(PduType),
+        Type1(GroupIdentityReport),
+        Type1(GroupIdentityAcknowledgementRequest),
+        Type1(GroupIdentityAttachDetachMode),
+    ]
+    type2 = []
+    type34 = [
+        Type3(Proprietary),
+        Type3(GroupReportResponse),
+        Type4(GroupIdentityDownlink),
     ]
 
 
@@ -31,5 +49,6 @@ class DLocationUpdateAccept(Pdu):
 class MmPdu(PduDiscriminator):
     element = PduType
     pdu_types = {
-        5: DLocationUpdateAccept
+        5: DLocationUpdateAccept,
+        10: DAttachDetachGroupIdentity,
     }

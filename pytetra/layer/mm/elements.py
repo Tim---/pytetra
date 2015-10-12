@@ -171,6 +171,30 @@ class VGssi(IntElement):
     length = 24
 
 
+# 16.10.26 Group identity report
+class GroupIdentityReport(IntElement):
+    name = "Group identity report"
+    length = 1
+
+
+# 16.10.13 Group identity acknowledgement request
+class GroupIdentityAcknowledgementRequest(IntElement):
+    name = "Group identity acknowledgement request"
+    length = 1
+
+
+# 16.10.17 Group identity attach/detach mode
+class GroupIdentityAttachDetachMode(IntElement):
+    name = "Group identity attach/detach mode"
+    length = 1
+
+
+# 16.10.27A Group report response
+class GroupReportResponse(IntElement):
+    name = "Group report response"
+    length = 1
+
+
 class GroupIdentityDownlink(CompoundElement):
     name = "Group identity downlink"
     identifier = 7
@@ -188,7 +212,7 @@ class GroupIdentityDownlink(CompoundElement):
     type34 = []
 
 
-class GroupIdendtityLocationAccept(CompoundElement):
+class GroupIdentityLocationAccept(CompoundElement):
     name = "Group identity location accept"
     identifier = 5
 

@@ -39,7 +39,7 @@ class MmTestCase(unittest.TestCase):
         pdu = DLocationUpdateAccept(
             PduType(5),
             LocationUpdateAcceptType('ITSI attach'),
-            GroupIdendtityLocationAccept(
+            GroupIdentityLocationAccept(
                 GroupIdentityAcceptReject('accept'),
                 Reserved(0),
                 [
