@@ -1,5 +1,6 @@
-from pytetra.layer.mac.pdu import MacPdu, NullPdu, SyncPdu, AccessAssignPdu, SysinfoPdu
+from pytetra.layer.mac.pdu import MacPdu, NullPdu, SyncPdu, AccessAssignPdu, SysinfoPdu, MacResourcePdu, MacFrag, MacEnd
 from pytetra.layer.mac.decoder import Decoders
+from pytetra.layer.mac.defragmenter import MacDefragmenter
 from pytetra.sap.tpsap import UpperTpSap
 from pytetra.sap.tmvsap import UpperTmvSap
 from pytetra.timebase import g_timebase
@@ -79,6 +80,7 @@ class UpperMac(Layer, UpperTmvSap):
         super(UpperMac, self).__init__(stack)
 
         self.downlink_usage_marker = None
+        self.defragmenter = MacDefragmenter()
 
     def tmv_unitdata_indication(self, block, channel, crc_pass):
         if channel == "AACH":
@@ -112,12 +114,11 @@ class UpperMac(Layer, UpperTmvSap):
                         if pdu.length_indication == 62:
                             self.stack.lower_mac.bkn2_stolen = True
                         break
-                    if isinstance(pdu, MacPdu):
-                        self.warning('Unknown Mac PDU type')
-                    else:
-                        if isinstance(pdu, SysinfoPdu):
-                            self.stack.llc.tmb_sysinfo_indication(pdu.sdu)
-                        elif len(pdu.sdu):
+                    elif isinstance(pdu, SysinfoPdu):
+                        self.stack.llc.tmb_sysinfo_indication(pdu.sdu)
+                    elif isinstance(pdu, MacResourcePdu) or isinstance(pdu, MacFrag) or isinstance(pdu, MacEnd):
+                        pdu = self.defragmenter.process_pdu(pdu)
+                        if pdu and len(pdu.sdu):
                             self.stack.llc.tma_unitdata_indication(pdu.sdu)
 
     def tmd_unitdata_indication(self, block, channel, crc_pass):

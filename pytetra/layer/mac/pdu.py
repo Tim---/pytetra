@@ -14,8 +14,78 @@ class MacPdu(Pdu):
         super(MacPdu, cls).__init__(pdu, bits)
         if pdu.pdu_type == 0:
             return MacResourcePdu(bits)
+        elif pdu.pdu_type == 1:
+            return MacFragEnd(bits)
         elif pdu.pdu_type == 2:
             return BroadcastPdu(bits)
+
+
+class MacFragEnd(Pdu):
+    fields_desc = [
+        UIntField("pdu_subtype", 1),
+    ]
+
+    def __new__(cls, bits):
+        pdu = super(MacFragEnd, cls).__new__(cls, bits)
+        super(MacFragEnd, cls).__init__(pdu, bits)
+        if pdu.pdu_subtype == 0:
+            return MacFrag(bits)
+        elif pdu.pdu_subtype == 1:
+            return MacEnd(bits)
+
+
+# 21.4.3.2 MAC-FRAG (downlink)
+class MacFrag(Pdu):
+    fields_desc = [
+        UIntField("fill_bits_indication", 1),
+    ]
+
+    def __init__(self, bits):
+        super(MacFrag, self).__init__(bits)
+        sdu = BitsField('sdu', len(bits)).dissect(self, bits)
+        if self.fill_bits_indication:
+            while sdu[-1] == '0':
+                sdu = sdu[:-1]
+            sdu = sdu[:-1]
+        self.fields['sdu'] = sdu
+
+
+# 21.4.3.3 MAC-END (downlink)
+class MacEnd(Pdu):
+    fields_desc = [
+        UIntField("fill_bits_indication", 1),
+        UIntField("position_of_grant", 1),
+        UIntField("length_indication", 6),
+        UIntField("slot_granting_flag", 1),
+        ConditionalField(UIntField("slot_granting_element", 8), lambda pkt: pkt.slot_granting_flag),
+        UIntField("channel_allocation_flag", 1),
+        ConditionalField(UIntField("allocation_type", 2), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("timeslot_assigned", 4), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("up_down_assigned", 2), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("clch_permission", 1), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("cell_change", 1), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("carrier_number", 12), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("ext_carrier_number", 1), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("freq_band", 4), lambda pkt: pkt.channel_allocation_flag and pkt.ext_carrier_number),
+        ConditionalField(UIntField("offset", 2), lambda pkt: pkt.channel_allocation_flag and pkt.ext_carrier_number),
+        ConditionalField(UIntField("duplex_spacing", 3), lambda pkt: pkt.channel_allocation_flag and pkt.ext_carrier_number),
+        ConditionalField(UIntField("reverse_operation", 1), lambda pkt: pkt.channel_allocation_flag and pkt.ext_carrier_number),
+        ConditionalField(UIntField("monitoring_pattern", 2), lambda pkt: pkt.channel_allocation_flag),
+        ConditionalField(UIntField("frame_18_monitoring_pattern", 2), lambda pkt: pkt.channel_allocation_flag and pkt.monitoring_pattern == 0),
+    ]
+
+    def __init__(self, bits):
+        initialSize = len(bits) + 3
+        super(MacEnd, self).__init__(bits)
+        if self.length_indication < 4 or self.length_indication > 34:
+            print "MAC PDU length problem"
+        sduSize = self.length_indication * 8 - (initialSize - len(bits))
+        sdu = BitsField('sdu', sduSize).dissect(self, bits)
+        if self.fill_bits_indication:
+            while sdu[-1] == '0':
+                sdu = sdu[:-1]
+            sdu = sdu[:-1]
+        self.fields['sdu'] = sdu
 
 
 class NullPdu(Pdu):
