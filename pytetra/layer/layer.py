@@ -10,3 +10,6 @@ class Layer(object):
 
     def info(self, message):
         Logger.log('%s: %s' % (self.__class__.__name__, message))
+
+    def expose_pdu(self, pdu):
+        self.stack.user.pdu_indication(self.__class__.__name__, pdu)

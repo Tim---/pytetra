@@ -86,7 +86,7 @@ class UpperMac(Layer, UpperTmvSap):
         if channel == "AACH":
             if crc_pass:
                 pdu = AccessAssignPdu(block)
-                self.info("%s" % (repr(pdu, )))
+                self.expose_pdu(pdu)
 
                 if g_timebase.fn == 18:
                     self.downlink_usage_marker = self.UMc
@@ -100,7 +100,7 @@ class UpperMac(Layer, UpperTmvSap):
         elif crc_pass:
             if channel == "BSCH":
                 pdu = SyncPdu(block)
-                self.info("%s" % (repr(pdu, )))
+                self.expose_pdu(pdu)
                 g_timebase.update(pdu.timeslot_number + 1, pdu.frame_number, pdu.multiframe_number)
                 self.stack.lower_mac.set_colour_code(pdu.colour_code)
                 self.stack.llc.tmb_sync_indication(pdu.tm_sdu)
@@ -109,7 +109,7 @@ class UpperMac(Layer, UpperTmvSap):
                     if len(block) < 23:
                         break
                     pdu = MacPdu(block)
-                    self.info("%s" % (repr(pdu, )))
+                    self.expose_pdu(pdu)
                     if isinstance(pdu, NullPdu):
                         if pdu.length_indication == 62:
                             self.stack.lower_mac.bkn2_stolen = True

@@ -77,8 +77,6 @@ class MacEnd(Pdu):
     def __init__(self, bits):
         initialSize = len(bits) + 3
         super(MacEnd, self).__init__(bits)
-        if self.length_indication < 4 or self.length_indication > 34:
-            print "MAC PDU length problem"
         sduSize = self.length_indication * 8 - (initialSize - len(bits))
         sdu = BitsField('sdu', sduSize).dissect(self, bits)
         if self.fill_bits_indication:
@@ -141,8 +139,6 @@ class MacResourcePdu(Pdu):
     def __init__(self, bits):
         initialSize = len(bits) + 2
         super(MacResourcePdu, self).__init__(bits)
-        if self.length_indication < 4 or self.length_indication > 34:
-            print "MAC PDU length problem"
         sduSize = self.length_indication * 8 - (initialSize - len(bits))
         sdu = BitsField('sdu', sduSize).dissect(self, bits)
         if self.fill_bits_indication:

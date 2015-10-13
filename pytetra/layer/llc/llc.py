@@ -7,7 +7,7 @@ from pytetra.layer import Layer
 class Llc(Layer, UpperTmaSap, UpperTmbSap):
     def tma_unitdata_indication(self, sdu):
         pdu = LlcPdu(sdu)
-        self.info("%s" % (repr(pdu, )))
+        self.expose_pdu(pdu)
         if pdu and 'sdu' in pdu.fields:
             self.stack.mle.tl_unitdata_indication(pdu.sdu)
 
