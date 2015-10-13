@@ -43,6 +43,11 @@ class Phy(Layer):
             else:
                 self.decode()
 
+    def feed_from_file(self, fd):
+        with open(fd, 'rb') as fd:
+            for data in iter(lambda: map(ord, fd.read(512)), []):
+                self.feed(data)
+
     def delete(self, size):
         del self.stream[:size]
         self.index += size

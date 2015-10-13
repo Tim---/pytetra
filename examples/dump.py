@@ -14,6 +14,4 @@ if __name__ == "__main__":
         print "Usage : dump.py <filename>"
 
     stack = TetraStack(MyUserLayer)
-    with open(sys.argv[1], 'rb') as fd:
-        for data in iter(lambda: map(ord, fd.read(512)), []):
-            stack.phy.feed(data)
+    stack.phy.feed_from_file(sys.argv[1])
