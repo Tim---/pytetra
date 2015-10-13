@@ -45,10 +45,27 @@ class DAttachDetachGroupIdentity(Pdu):
     ]
 
 
+# 16.9.2.2 D-ATTACH/DETACH GROUP IDENTITY ACKNOWLEDGEMENT
+class DAttachDetachGroupIdentityAcknowledgement(Pdu):
+    name = "D-ATTACH/DETACH GROUP IDENTITY ACKNOWLEDGEMENT"
+
+    type1 = [
+        Type1(PduType),
+        Type1(GroupIdentityAcceptReject),
+        Type1(Reserved),
+    ]
+    type2 = []
+    type34 = [
+        Type3(Proprietary),
+        Type4(GroupIdentityDownlink),
+    ]
+
+
 # 16.10.39 PDU type
 class MmPdu(PduDiscriminator):
     element = PduType
     pdu_types = {
         5: DLocationUpdateAccept,
         10: DAttachDetachGroupIdentity,
+        11: DAttachDetachGroupIdentityAcknowledgement,
     }
