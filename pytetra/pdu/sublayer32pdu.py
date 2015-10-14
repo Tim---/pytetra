@@ -32,20 +32,20 @@ class LeafElement(Element):
 
 class IntElement(LeafElement):
     @classmethod
-    def parse(cls, bits):
-        return cls(bits.read_int(cls.length))
+    def parse(cls, bits, length=None):
+        return cls(bits.read_int(length if length is not None else cls.length))
 
 
 class BitsElement(LeafElement):
     @classmethod
-    def parse(cls, bits):
-        return cls(bits.read(cls.length))
+    def parse(cls, bits, length=None):
+        return cls(bits.read(length if length is not None else cls.length))
 
 
 class EnumElement(LeafElement):
     @classmethod
-    def parse(cls, bits):
-        return cls(cls.enum[bits.read_int(cls.length)])
+    def parse(cls, bits, length=None):
+        return cls(cls.enum[bits.read_int(length if length is not None else cls.length)])
 
 
 class CompoundElement(Element):
@@ -61,7 +61,7 @@ class CompoundElement(Element):
             self.add_field(elem)
 
     @classmethod
-    def parse(cls, bits):
+    def parse(cls, bits, length=None):
         compound_element = cls()
 
         for elem in compound_element.type1:
@@ -128,13 +128,15 @@ class TypeField(object):
 
 
 class Type1(TypeField):
-    def __init__(self, element, cond=None):
+    def __init__(self, element, cond=None, length_func=None):
         self.element = element
         self.cond = cond
+        self.length_func = length_func
 
     def decode(self, parent, bits):
+        length = self.length_func(parent) if self.length_func else None
         if self.cond is None or self.cond(parent):
-            parent.add_field(self.element.parse(bits))
+            parent.add_field(self.element.parse(bits, length))
 
 
 class Type2(TypeField):

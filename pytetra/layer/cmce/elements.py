@@ -1,4 +1,4 @@
-from pytetra.pdu.sublayer32pdu import IntElement, EnumElement, CompoundElement, Type1, Type2, Type3
+from pytetra.pdu.sublayer32pdu import IntElement, EnumElement, CompoundElement, Type1, Type2, Type3, BitsElement
 
 
 # 14.8.28 PDU type
@@ -276,3 +276,45 @@ class CallTimeoutSetUpPhase(IntElement):
 class CallStatus(IntElement):
     name = "Call status"
     length = 3
+
+
+# 14.8.34 Pre-coded status
+class PrecodedStatus(IntElement):
+    name = "Pre-coded status"
+    length = 16
+
+
+# 14.8.38 Short data type identifier
+class ShortDataTypeIdentifier(IntElement):
+    name = "Short data type identifier"
+    length = 2
+
+
+# 14.8.49 User defined data-1
+class UserDefinedData1(BitsElement):
+    name = "User Defined Data 1"
+    length = 16
+
+
+# 14.8.50 User defined data-2
+class UserDefinedData2(BitsElement):
+    name = "User Defined Data 2"
+    length = 32
+
+
+# 14.8.51 User defined data-3
+class UserDefinedData3(BitsElement):
+    name = "User Defined Data 3"
+    length = 64
+
+
+# 14.8.24 Length indicator
+class LengthIndicator(IntElement):
+    name = "Length indicator"
+    length = 11
+
+
+# 14.8.52 User defined data-4
+class UserDefinedData4(BitsElement):
+    name = "User Defined Data 3"
+    length = None

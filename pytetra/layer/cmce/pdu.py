@@ -30,6 +30,26 @@ class DConnect(Pdu):
     ]
 
 
+# 14.7.1.5 D-CONNECT ACKNOWLEDGE
+class DConnectAcknowledge(Pdu):
+    name = "D-CONNECT ACKNOWLEDGE"
+
+    type1 = [
+        Type1(PduType),
+        Type1(CallIdentifier),
+        Type1(CallTimeout),
+        Type1(TransmissionGrant),
+        Type1(TransmissionRequestPermission),
+    ]
+    type2 = [
+        Type2(NotificationIndicator),
+    ]
+    type34 = [
+        Type3(Facility),
+        Type3(Proprietary),
+    ]
+
+
 # 14.7.1.9 D-RELEASE
 class DRelease(Pdu):
     name = "D-RELEASE"
@@ -75,6 +95,24 @@ class DSetup(Pdu):
         Type3(Facility),
         Type3(DmMsAddress),
         Type3(Proprietary),
+    ]
+
+
+# 14.7.1.11 D-STATUS
+class DStatus(Pdu):
+    name = "D-SETUP"
+
+    type1 = [
+        Type1(PduType),
+        Type1(CallingPartyTypeIdentifier),
+        Type1(CallingPartySsi, cond=lambda pkt: pkt[CallingPartyTypeIdentifier].value in ["SSI", "TSI"]),
+        Type1(CallingPartyExtension, cond=lambda pkt: pkt[CallingPartyTypeIdentifier].value == "TSI"),
+        Type1(PrecodedStatus),
+    ]
+    type2 = []
+    type34 = [
+        Type3(ExternalSubscriberNumber),
+        Type3(DmMsAddress),
     ]
 
 
@@ -144,14 +182,40 @@ class DCallProceeding(Pdu):
     ]
 
 
+# 14.7.1.10 D-SDS-DATA
+class DSdsData(Pdu):
+    name = "D-SDS-DATA"
+
+    type1 = [
+        Type1(PduType),
+        Type1(CallingPartyTypeIdentifier),
+        Type1(CallingPartySsi, cond=lambda pkt: pkt[CallingPartyTypeIdentifier].value in ["SSI", "TSI"]),
+        Type1(CallingPartyExtension, cond=lambda pkt: pkt[CallingPartyTypeIdentifier].value == "TSI"),
+        Type1(ShortDataTypeIdentifier),
+        Type1(UserDefinedData1, cond=lambda pkt: pkt[ShortDataTypeIdentifier].value == 0),
+        Type1(UserDefinedData2, cond=lambda pkt: pkt[ShortDataTypeIdentifier].value == 1),
+        Type1(UserDefinedData3, cond=lambda pkt: pkt[ShortDataTypeIdentifier].value == 2),
+        Type1(LengthIndicator, cond=lambda pkt: pkt[ShortDataTypeIdentifier].value == 3),
+        Type1(UserDefinedData4, cond=lambda pkt: pkt[ShortDataTypeIdentifier].value == 3, length_func=lambda pkt: pkt[LengthIndicator].value),
+    ]
+    type2 = []
+    type34 = [
+        Type3(ExternalSubscriberNumber),
+        Type3(DmMsAddress),
+    ]
+
+
 # 14.8.28 PDU type
 class CmcePdu(PduDiscriminator):
     element = PduType
     pdu_types = {
         1: DCallProceeding,
         2: DConnect,
+        3: DConnectAcknowledge,
         6: DRelease,
         7: DSetup,
+        8: DStatus,
         9: DTxCeased,
         11: DTxGranted,
+        15: DSdsData,
     }
