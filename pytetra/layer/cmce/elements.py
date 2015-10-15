@@ -318,3 +318,9 @@ class LengthIndicator(IntElement):
 class UserDefinedData4(BitsElement):
     name = "User Defined Data 3"
     length = None
+
+
+# 14.8.14 Call queued
+class CallQueued(IntElement):
+    name = "Call queued"
+    length = 1

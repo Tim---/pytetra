@@ -205,6 +205,28 @@ class DSdsData(Pdu):
     ]
 
 
+# 14.7.1.1 D-ALERT
+class DAlert(Pdu):
+    name = "D-ALERT"
+
+    type1 = [
+        Type1(PduType),
+        Type1(CallIdentifier),
+        Type1(CallTimeoutSetUpPhase),
+        Type1(Reserved),
+        Type1(SimplexDuplexSelection),
+        Type1(CallQueued),
+    ]
+    type2 = [
+        Type2(BasicServiceInformation),
+        Type2(NotificationIndicator),
+    ]
+    type34 = [
+        Type3(Facility),
+        Type3(Proprietary),
+    ]
+
+
 # 14.8.28 PDU type
 class CmcePdu(PduDiscriminator):
     element = PduType
