@@ -100,7 +100,7 @@ class DSetup(Pdu):
 
 # 14.7.1.11 D-STATUS
 class DStatus(Pdu):
-    name = "D-SETUP"
+    name = "D-STATUS"
 
     type1 = [
         Type1(PduType),

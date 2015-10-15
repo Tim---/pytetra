@@ -109,7 +109,6 @@ class UpperMac(Layer, UpperTmvSap):
                     if len(block) < 23:
                         break
                     pdu = MacPdu(block)
-                    self.expose_pdu(pdu)
                     if isinstance(pdu, NullPdu):
                         if pdu.length_indication == 62:
                             self.stack.lower_mac.bkn2_stolen = True
@@ -118,8 +117,10 @@ class UpperMac(Layer, UpperTmvSap):
                         self.stack.llc.tmb_sysinfo_indication(pdu.sdu)
                     elif isinstance(pdu, MacResourcePdu) or isinstance(pdu, MacFrag) or isinstance(pdu, MacEnd):
                         pdu = self.defragmenter.process_pdu(pdu)
-                        if pdu and len(pdu.sdu):
-                            self.stack.llc.tma_unitdata_indication(pdu.sdu)
+                        if pdu:
+                            self.expose_pdu(pdu)
+                            if len(pdu.sdu):
+                                self.stack.llc.tma_unitdata_indication(pdu.sdu)
 
     def tmd_unitdata_indication(self, block, channel, crc_pass):
-        pass
+        self.stack.user.speech_indication(block, not crc_pass, self.downlink_usage_marker)
