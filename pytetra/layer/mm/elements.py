@@ -192,6 +192,7 @@ class GroupIdentityAttachDetachMode(IntElement):
 # 16.10.27A Group report response
 class GroupReportResponse(IntElement):
     name = "Group report response"
+    identifier = 4
     length = 1
 
 
@@ -228,14 +229,17 @@ class GroupIdentityLocationAccept(CompoundElement):
 
 class DefaultGroupAttachementLifetime(IntElement):
     name = "Default group attachment lifetime"
+    identifier = 1
     length = 2
 
 
 class AuthenticationDownlink(IntElement):
     name = "Authentication Downlink"
+    identifier = 10
     length = None  # TODO
 
 
 class Proprietary(IntElement):
     name = "Proprietary"
+    identifier = 15
     length = None  # TODO
