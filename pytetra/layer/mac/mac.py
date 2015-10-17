@@ -114,6 +114,7 @@ class UpperMac(Layer, UpperTmvSap):
                             self.stack.lower_mac.bkn2_stolen = True
                         break
                     elif isinstance(pdu, SysinfoPdu):
+                        self.expose_pdu(pdu)
                         self.stack.llc.tmb_sysinfo_indication(pdu.sdu)
                     elif isinstance(pdu, MacResourcePdu) or isinstance(pdu, MacFrag) or isinstance(pdu, MacEnd):
                         pdu = self.defragmenter.process_pdu(pdu)
