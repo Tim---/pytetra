@@ -105,8 +105,8 @@ class DSetup(Pdu):
         Type2(NotificationIndicator),
         Type2(TemporaryAddress),
         Type2(CallingPartyTypeIdentifier),
-        Type2(CallingPartySsi, cond=lambda pkt: pkt[CallingPartyTypeIdentifier].value in ["SSI", "TSI"]),
-        Type2(CallingPartyExtension, cond=lambda pkt: pkt[CallingPartyTypeIdentifier].value == "TSI"),
+        Type2(CallingPartySsi, cond=lambda pkt: CallingPartyTypeIdentifier in pkt.fields and pkt[CallingPartyTypeIdentifier].value in ["SSI", "TSI"]),
+        Type2(CallingPartyExtension, cond=lambda pkt: CallingPartyTypeIdentifier in pkt.fields and pkt[CallingPartyTypeIdentifier].value == "TSI"),
     ]
     type34 = [
         Type3(ExternalSubscriberNumber),
