@@ -17,6 +17,8 @@ class Mle(Layer, UpperTlaSap, UpperTlbSap):
         elif pdu[ProtocolDiscriminator].value == 'MLE':
             pdu = MlePdu.parse(pdu[SduElement].value)
             self.expose_pdu(pdu)
+            if isinstance(pdu, DRestoreAck):
+                self.stack.cmce.mle_unitdata_indication(pdu[SduElement].value)
 
     def tl_sync_indication(self, sdu):
         pdu = DMleSyncPdu.parse(sdu)

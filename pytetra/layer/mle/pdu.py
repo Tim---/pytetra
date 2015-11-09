@@ -61,9 +61,21 @@ class DNwrkBroadcast(Pdu):
     type34 = []
 
 
+# 18.4.1.4.4 D-RESTORE-ACK
+class DRestoreAck(Pdu):
+    name = "D-RESTORE-ACK"
+    type1 = [
+        Type1(PduType),
+    ]
+    type2 = []
+    type34 = []
+    sdu = True
+
+
 # 18.4.1.2 PDU type
 class MlePdu(PduDiscriminator):
     element = PduType
     pdu_types = {
         2: DNwrkBroadcast,
+        4: DRestoreAck,
     }

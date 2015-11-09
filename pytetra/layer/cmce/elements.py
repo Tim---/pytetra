@@ -182,6 +182,23 @@ class TemporaryAddress(IntElement):
     length = 24
 
 
+# 14.8.26 Modify
+class Modify(CompoundElement):
+    name = "Modify"
+    type1 = [
+        Type1(SimplexDuplexSelection),
+        Type1(BasicServiceInformation),
+    ]
+    type2 = []
+    type34 = []
+
+
+# 14.8.25 New call identifier
+class NewCallIdentifier(IntElement):
+    name = "New Call identifier"
+    length = 14
+
+
 # 14.8.27 Notification indicator
 class NotificationIndicator(IntElement):
     name = "Notification indicator"
@@ -282,6 +299,12 @@ class CallStatus(IntElement):
 class PrecodedStatus(IntElement):
     name = "Pre-coded status"
     length = 16
+
+
+# 14.8.37 Reset call time-out timer (T310)
+class ResetCallTimeoutTimer(IntElement):
+    name = "Reset call time-out timer (T310)"
+    length = 1
 
 
 # 14.8.38 Short data type identifier

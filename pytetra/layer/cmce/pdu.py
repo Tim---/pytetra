@@ -200,6 +200,32 @@ class DCallProceeding(Pdu):
     ]
 
 
+# 14.7.1.3 D-CALL RESTORE
+class DCallRestore(Pdu):
+    name = "D-CALL RESTORE"
+
+    type1 = [
+        Type1(PduType),
+        Type1(CallIdentifier),
+        Type1(TransmissionGrant),
+        Type1(TransmissionRequestPermission),
+        Type1(ResetCallTimeoutTimer),
+    ]
+    type2 = [
+        Type2(NewCallIdentifier),
+        Type2(CallTimeout),
+        Type2(CallStatus),
+        Type2(Modify),
+        Type2(NotificationIndicator),
+    ]
+    type34 = [
+        Type3(Facility),
+        Type3(TemporaryAddress),
+        Type3(DmMsAddress),
+        Type3(Proprietary),
+    ]
+
+
 # 14.7.1.10 D-SDS-DATA
 class DSdsData(Pdu):
     name = "D-SDS-DATA"
@@ -258,5 +284,6 @@ class CmcePdu(PduDiscriminator):
         8: DStatus,
         9: DTxCeased,
         11: DTxGranted,
+        14: DCallRestore,
         15: DSdsData,
     }
