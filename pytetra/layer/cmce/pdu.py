@@ -30,6 +30,24 @@ class DConnect(Pdu):
     ]
 
 
+# 14.7.1.6 D-DISCONNECT
+class DDisconnect(Pdu):
+    name = "D-DISCONNECT"
+
+    type1 = [
+        Type1(PduType),
+        Type1(CallIdentifier),
+        Type1(DisconnectCause),
+    ]
+    type2 = [
+        Type2(NotificationIndicator),
+    ]
+    type34 = [
+        Type3(Facility),
+        Type3(Proprietary),
+    ]
+
+
 # 14.7.1.5 D-CONNECT ACKNOWLEDGE
 class DConnectAcknowledge(Pdu):
     name = "D-CONNECT ACKNOWLEDGE"
@@ -234,6 +252,7 @@ class CmcePdu(PduDiscriminator):
         1: DCallProceeding,
         2: DConnect,
         3: DConnectAcknowledge,
+        4: DDisconnect,
         6: DRelease,
         7: DSetup,
         8: DStatus,

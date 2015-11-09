@@ -37,7 +37,7 @@ class Cmce(Layer, UpperLcmcSap):
         super(Cmce, self).__init__(stack)
         self.cc = CallControl()
         self.ss = SupplementaryServices()
-        self.cc = ShortDataService()
+        self.sds = ShortDataService()
 
     def mle_unitdata_indication(self, sdu):
         pdu = CmcePdu.parse(sdu)
