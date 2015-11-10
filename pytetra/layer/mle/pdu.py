@@ -6,7 +6,7 @@ from pytetra.layer.mle.elements import *
 
 
 # 18.4.2.1 D-MLE-SYNC
-class DMleSyncPdu(Pdu):
+class DMleSync(Pdu):
     name = "D-MLE-SYNC"
     type1 = [
         Type1(Mcc),
@@ -21,7 +21,7 @@ class DMleSyncPdu(Pdu):
 
 
 # 18.4.2.2 D-MLE-SYSINFO
-class DMleSysinfoPdu(Pdu):
+class DMleSysinfo(Pdu):
     name = "D-MLE-SYSINFO"
     type1 = [
         Type1(La),

@@ -1,7 +1,7 @@
 import unittest
 from pytetra.pdu.pdu import Bits
 from pytetra.pdu.sublayer32pdu import SduElement
-from pytetra.layer.mle.pdu import MleServicePdu, DMleSyncPdu, DMleSysinfoPdu
+from pytetra.layer.mle.pdu import MleServicePdu, DMleSync, DMleSysinfo
 from pytetra.layer.mle.elements import *
 
 
@@ -27,14 +27,14 @@ class MleTestCase(unittest.TestCase):
         #                                 **   Cell service level = 0 (Cell load unknown)
         #                                   *  Late entry information = 1 (Late entry available)
 
-        pdu = DMleSyncPdu(
+        pdu = DMleSync(
             Mcc(1),
             Mnc(1),
             NeighbourCellBroadcast(2),
             CellServiceLevel('unknown'),
             LateEntrySupported('available')
         )
-        self.assertEqual(DMleSyncPdu.parse(Bits(bits)), pdu)
+        self.assertEqual(DMleSync.parse(Bits(bits)), pdu)
 
     def test_dmlesysinfo(self):
         bits = '000000000000011111111111111111110100100101'
@@ -54,7 +54,7 @@ class MleTestCase(unittest.TestCase):
         #                                               *  Air interface encryption service = 0 (Air interface encryption is not available on this cell)
         #                                                * Advanced link supported = 1 (Advanced link is supported on this cell)
 
-        pdu = DMleSysinfoPdu(
+        pdu = DMleSysinfo(
             La(1),
             SubscriberClass(65535),
             BsServiceDetails(
@@ -72,7 +72,7 @@ class MleTestCase(unittest.TestCase):
                 BsServiceAdvancedLink(1)
             )
         )
-        self.assertEqual(DMleSysinfoPdu.parse(Bits(bits)), pdu)
+        self.assertEqual(DMleSysinfo.parse(Bits(bits)), pdu)
 
 
 if __name__ == '__main__':

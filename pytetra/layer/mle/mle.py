@@ -1,7 +1,7 @@
 from pytetra.sap.tlasap import UpperTlaSap
 from pytetra.sap.tlbsap import UpperTlbSap
 from pytetra.pdu.sublayer32pdu import SduElement
-from pytetra.layer.mle.pdu import MlePdu, DMleSyncPdu, DMleSysinfoPdu, MleServicePdu
+from pytetra.layer.mle.pdu import MlePdu, DMleSync, DMleSysinfo, MleServicePdu, DRestoreAck
 from pytetra.layer.mle.elements import Mcc, Mnc, ProtocolDiscriminator
 from pytetra.layer import Layer
 
@@ -19,12 +19,14 @@ class Mle(Layer, UpperTlaSap, UpperTlbSap):
             self.expose_pdu(pdu)
             if isinstance(pdu, DRestoreAck):
                 self.stack.cmce.mle_unitdata_indication(pdu[SduElement].value)
+        else:
+            raise NotImplementedError('Unknown MLE service : %s' % (pdu[ProtocolDiscriminator].value, ))
 
     def tl_sync_indication(self, sdu):
-        pdu = DMleSyncPdu.parse(sdu)
+        pdu = DMleSync.parse(sdu)
         self.stack.lower_mac.set_mobile_codes(pdu[Mcc].value, pdu[Mnc].value)
         self.expose_pdu(pdu)
 
     def tl_sysinfo_indication(self, sdu):
-        pdu = DMleSysinfoPdu.parse(sdu)
+        pdu = DMleSysinfo.parse(sdu)
         self.expose_pdu(pdu)
